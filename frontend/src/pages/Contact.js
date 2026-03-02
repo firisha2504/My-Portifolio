@@ -30,13 +30,14 @@ const Contact = () => {
   return (
     <div className="contact">
       <div className="container">
-        <h1>Contact Me</h1>
+        <h1>Get In Touch</h1>
+        <p className="contact-subtitle">Have a project in mind? Let's talk about it.</p>
         <form onSubmit={handleSubmit} className="contact-form">
           <input type="text" name="name" placeholder="Your Name" value={formData.name} onChange={handleChange} required />
           <input type="email" name="email" placeholder="Your Email" value={formData.email} onChange={handleChange} required />
           <input type="text" name="subject" placeholder="Subject" value={formData.subject} onChange={handleChange} />
-          <textarea name="message" placeholder="Your Message" rows="5" value={formData.message} onChange={handleChange} required />
-          <button type="submit" className="btn-primary" disabled={loading}>{loading ? 'Sending...' : 'Send Message'}</button>
+          <textarea name="message" placeholder="Your Message" rows="6" value={formData.message} onChange={handleChange} required />
+          <button type="submit" disabled={loading}>{loading ? 'Sending...' : 'Send Message'}</button>
           {status.message && <div className={status.type}>{status.message}</div>}
         </form>
       </div>

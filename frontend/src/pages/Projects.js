@@ -30,15 +30,20 @@ const Projects = () => {
     <div className="projects">
       <div className="container">
         <h1>My Projects</h1>
+        <p className="projects-subtitle">A selection of recent work showcasing my skills and experience.</p>
         <div className="projects-grid">
           {projects.map((project) => (
             <div key={project.id} className="project-card">
               {project.image_url && <img src={project.image_url} alt={project.title} />}
               <h3>{project.title}</h3>
               <p>{project.description}</p>
-              <div className="tech-stack">{project.tech_stack}</div>
+              <div className="tech-stack">
+                {project.tech_stack && project.tech_stack.split(',').map((tech, i) => (
+                  <span key={i}>{tech.trim()}</span>
+                ))}
+              </div>
               <div className="project-links">
-                {project.github_link && <a href={project.github_link} target="_blank" rel="noopener noreferrer">GitHub</a>}
+                {project.github_link && <a href={project.github_link} target="_blank" rel="noopener noreferrer">Code</a>}
                 {project.live_link && <a href={project.live_link} target="_blank" rel="noopener noreferrer">Live Demo</a>}
               </div>
             </div>

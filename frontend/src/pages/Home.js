@@ -30,9 +30,9 @@ const Home = () => {
           {profile?.profile_image && (
             <img src={profile.profile_image} alt={profile.name} className="profile-pic" />
           )}
-          <h1>{profile?.name || 'Your Name'}</h1>
-          <h2>{profile?.title || 'Full Stack Developer'}</h2>
-          <p>{profile?.bio || 'Welcome to my portfolio'}</p>
+          <h2>{profile?.title || 'FULL-STACK DEVELOPER'}</h2>
+          <h1>Hi, I'm <span>{profile?.name || 'Your Name'}</span></h1>
+          <p>{profile?.bio || 'I craft elegant, scalable web applications with modern technologies. Passionate about clean code, great UX, and solving real-world problems.'}</p>
           {profile?.resume_link && (
             <a href={profile.resume_link} download className="btn-primary">Download CV</a>
           )}
