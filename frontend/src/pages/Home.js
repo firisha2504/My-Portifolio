@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import API from '../utils/api';
 import './Home.css';
 
@@ -21,6 +22,10 @@ const Home = () => {
     }
   };
 
+  const scrollToProjects = () => {
+    window.location.href = '/projects';
+  };
+
   if (loading) return <div className="loading">Loading...</div>;
 
   return (
@@ -31,11 +36,22 @@ const Home = () => {
             <img src={profile.profile_image} alt={profile.name} className="profile-pic" />
           )}
           <h2>{profile?.title || 'FULL-STACK DEVELOPER'}</h2>
-          <h1>Hi, I'm <span>{profile?.name || 'Your Name'}</span></h1>
+          <h1>Hi, I'm <span>{profile?.name || 'John Doe'}</span></h1>
           <p>{profile?.bio || 'I craft elegant, scalable web applications with modern technologies. Passionate about clean code, great UX, and solving real-world problems.'}</p>
-          {profile?.resume_link && (
-            <a href={profile.resume_link} download className="btn-primary">Download CV</a>
-          )}
+          <div className="hero-buttons">
+            <Link to="/projects" className="btn-primary">View My Work</Link>
+            {profile?.resume_link && (
+              <a href={profile.resume_link} download className="btn-secondary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                </svg>
+                Download CV
+              </a>
+            )}
+          </div>
+        </div>
+        <div className="scroll-indicator">
+          <div className="mouse"></div>
         </div>
       </div>
     </div>
