@@ -8,6 +8,7 @@ const Dashboard = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     navigate('/login');
   };
 
@@ -19,6 +20,7 @@ const Dashboard = () => {
           <Link to="/dashboard/profile">Profile</Link>
           <Link to="/dashboard/projects">Projects</Link>
           <Link to="/dashboard/contacts">Messages</Link>
+          <Link to="/dashboard/settings">Settings</Link>
           <button onClick={handleLogout} className="btn-primary">Logout</button>
         </nav>
       </div>
@@ -28,6 +30,7 @@ const Dashboard = () => {
           <Route path="/profile" element={<ProfileManager />} />
           <Route path="/projects" element={<ProjectsManager />} />
           <Route path="/contacts" element={<ContactsManager />} />
+          <Route path="/settings" element={<AdminSettings />} />
         </Routes>
       </div>
     </div>
@@ -120,6 +123,153 @@ const ContactsManager = () => {
           </div>
         ))}
       </div>
+    </div>
+  );
+};
+
+const AdminSettings = () => {
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [message, setMessage] = useState({ type: '', text: '' });
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  const fetchUserData = async () => {
+    try {
+      const { data } = await API.get('/auth/profile');
+      setFormData({
+        ...formData,
+        username: data.data.username,
+        email: data.data.email
+      });
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage({ type: '', text: '' });
+
+    // Validate passwords match if changing password
+    if (formData.newPassword && formData.newPassword !== formData.confirmPassword) {
+      setMessage({ type: 'error', text: 'New passwords do not match' });
+      setLoading(false);
+      return;
+    }
+
+    try {
+      await API.put('/auth/profile', {
+        username: formData.username,
+        email: formData.email,
+        currentPassword: formData.currentPassword,
+        newPassword: formData.newPassword
+      });
+
+      setMessage({ type: 'success', text: 'Settings updated successfully!' });
+      setFormData({ ...formData, currentPassword: '', newPassword: '', confirmPassword: '' });
+      
+      // Update stored user data
+      const user = JSON.parse(localStorage.getItem('user'));
+      user.username = formData.username;
+      user.email = formData.email;
+      localStorage.setItem('user', JSON.stringify(user));
+    } catch (error) {
+      setMessage({ 
+        type: 'error', 
+        text: error.response?.data?.message || 'Failed to update settings' 
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="admin-settings">
+      <h1>Account Settings</h1>
+      <form onSubmit={handleSubmit} className="settings-form">
+        <div className="form-section">
+          <h2>Account Information</h2>
+          <div className="form-group">
+            <label>Username</label>
+            <input
+              type="text"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Email</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+        </div>
+
+        <div className="form-section">
+          <h2>Change Password</h2>
+          <p className="form-hint">Leave blank if you don't want to change your password</p>
+          <div className="form-group">
+            <label>Current Password</label>
+            <input
+              type="password"
+              name="currentPassword"
+              value={formData.currentPassword}
+              onChange={handleChange}
+              placeholder="Enter current password"
+            />
+          </div>
+          <div className="form-group">
+            <label>New Password</label>
+            <input
+              type="password"
+              name="newPassword"
+              value={formData.newPassword}
+              onChange={handleChange}
+              placeholder="Enter new password"
+            />
+          </div>
+          <div className="form-group">
+            <label>Confirm New Password</label>
+            <input
+              type="password"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              placeholder="Confirm new password"
+            />
+          </div>
+        </div>
+
+        <button type="submit" className="btn-primary" disabled={loading}>
+          {loading ? 'Saving...' : 'Save Changes'}
+        </button>
+
+        {message.text && (
+          <div className={`message ${message.type}`}>
+            {message.text}
+          </div>
+        )}
+      </form>
     </div>
   );
 };

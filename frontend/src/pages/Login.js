@@ -4,7 +4,7 @@ import API from '../utils/api';
 import './Login.css';
 
 const Login = () => {
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [formData, setFormData] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -21,6 +21,7 @@ const Login = () => {
     try {
       const { data } = await API.post('/auth/login', formData);
       localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
@@ -45,18 +46,18 @@ const Login = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="email">Email Address</label>
+            <label htmlFor="username">Username</label>
             <div className="input-wrapper">
               <svg className="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                <polyline points="22,6 12,13 2,6"/>
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
               </svg>
               <input 
-                type="email" 
-                id="email"
-                name="email" 
-                placeholder="admin@portfolio.com" 
-                value={formData.email} 
+                type="text" 
+                id="username"
+                name="username" 
+                placeholder="admin" 
+                value={formData.username} 
                 onChange={handleChange} 
                 required 
               />
