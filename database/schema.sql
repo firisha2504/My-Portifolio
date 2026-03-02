@@ -50,7 +50,7 @@ CREATE TABLE contacts (
 
 -- Insert default admin user (password: admin123)
 INSERT INTO users (username, email, password, role) 
-VALUES ('admin', 'admin@portfolio.com', '$2b$10$YourHashedPasswordHere', 'admin');
+VALUES ('admin', 'admin@portfolio.com', '$2a$10$vtS8mHLjh/pREV1a4RvIx.SYKw1U6uFGqoomc9UDQJlll6uEJmxce', 'admin');
 
 -- Insert default profile
 INSERT INTO profile (name, title, bio) 
