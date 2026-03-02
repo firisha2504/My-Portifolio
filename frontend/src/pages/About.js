@@ -2,57 +2,67 @@ import React from 'react';
 import './About.css';
 
 const About = () => {
-  const skills = [
-    { name: 'React', level: 90 },
-    { name: 'Node.js', level: 85 },
-    { name: 'Express', level: 88 },
-    { name: 'MySQL', level: 80 },
-    { name: 'JavaScript', level: 92 },
-    { name: 'HTML/CSS', level: 95 },
-    { name: 'Git', level: 85 },
-    { name: 'REST APIs', level: 88 }
+  const skillCategories = [
+    {
+      title: 'Frontend',
+      icon: '💻',
+      skills: ['React.js', 'TypeScript', 'Tailwind CSS', 'Next.js']
+    },
+    {
+      title: 'Backend',
+      icon: '⚙️',
+      skills: ['Node.js', 'Express', 'REST APIs', 'GraphQL']
+    },
+    {
+      title: 'Database',
+      icon: '🗄️',
+      skills: ['MySQL', 'PostgreSQL', 'MongoDB', 'Redis']
+    },
+    {
+      title: 'DevOps',
+      icon: '🚀',
+      skills: ['Docker', 'CI/CD', 'AWS', 'Linux']
+    },
+    {
+      title: 'Mobile',
+      icon: '📱',
+      skills: ['React Native', 'PWA', 'Responsive Design']
+    },
+    {
+      title: 'Tools',
+      icon: '🛠️',
+      skills: ['Git', 'VS Code', 'Figma', 'Postman']
+    }
   ];
 
   return (
     <div className="about">
       <div className="container">
-        <h1>About Me</h1>
-        <p className="about-subtitle">Get to know me better</p>
+        <div className="about-header">
+          <h1>About Me</h1>
+          <p className="about-subtitle">Passionate developer with a love for building impactful digital experiences.</p>
+        </div>
         
         <section className="about-content">
           <div className="about-text">
-            <h2>Who I Am</h2>
-            <p>I'm a passionate full-stack developer with expertise in building modern, scalable web applications. With a strong foundation in both frontend and backend technologies, I create seamless digital experiences that solve real-world problems.</p>
-            <p>My journey in web development started with a curiosity about how things work on the internet, and it has evolved into a career where I get to build amazing products every day.</p>
-          </div>
-          
-          <div className="about-stats">
-            <div className="stat-card">
-              <h3>5+</h3>
-              <p>Years Experience</p>
-            </div>
-            <div className="stat-card">
-              <h3>50+</h3>
-              <p>Projects Completed</p>
-            </div>
-            <div className="stat-card">
-              <h3>30+</h3>
-              <p>Happy Clients</p>
-            </div>
+            <p>I'm a full-stack developer with over 5 years of experience building web applications that are fast, accessible, and scalable. I specialize in the JavaScript ecosystem, working with React on the frontend and Node.js on the backend.</p>
+            <p>When I'm not coding, you'll find me exploring new technologies, contributing to open-source projects, or writing technical articles. I believe in continuous learning and sharing knowledge with the community.</p>
           </div>
         </section>
 
-        <section className="skills">
-          <h2>Skills & Expertise</h2>
-          <div className="skills-grid">
-            {skills.map((skill, index) => (
-              <div key={index} className="skill-item">
-                <div className="skill-header">
-                  <span className="skill-name">{skill.name}</span>
-                  <span className="skill-percentage">{skill.level}%</span>
+        <section className="skills-section">
+          <h2>Skills & Technologies</h2>
+          <div className="skills-categories">
+            {skillCategories.map((category, index) => (
+              <div key={index} className="skill-category">
+                <div className="category-header">
+                  <span className="category-icon">{category.icon}</span>
+                  <h3>{category.title}</h3>
                 </div>
-                <div className="skill-bar">
-                  <div className="skill-progress" style={{ width: `${skill.level}%` }}></div>
+                <div className="category-skills">
+                  {category.skills.map((skill, i) => (
+                    <span key={i} className="skill-tag">{skill}</span>
+                  ))}
                 </div>
               </div>
             ))}

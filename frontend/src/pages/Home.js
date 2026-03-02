@@ -22,10 +22,6 @@ const Home = () => {
     }
   };
 
-  const scrollToProjects = () => {
-    window.location.href = '/projects';
-  };
-
   if (loading) return <div className="loading">Loading...</div>;
 
   return (
@@ -50,6 +46,26 @@ const Home = () => {
             )}
           </div>
         </div>
+
+        <div className="home-stats">
+          <div className="home-stat-card">
+            <div className="stat-number">5+</div>
+            <div className="stat-text">Years Experience</div>
+          </div>
+          <div className="home-stat-card">
+            <div className="stat-number">30+</div>
+            <div className="stat-text">Projects Completed</div>
+          </div>
+          <div className="home-stat-card">
+            <div className="stat-number">15+</div>
+            <div className="stat-text">Happy Clients</div>
+          </div>
+          <div className="home-stat-card">
+            <div className="stat-number">10+</div>
+            <div className="stat-text">Technologies</div>
+          </div>
+        </div>
+
         <div className="scroll-indicator">
           <div className="mouse"></div>
         </div>
