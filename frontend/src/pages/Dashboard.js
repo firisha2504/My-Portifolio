@@ -224,12 +224,12 @@ const ProfileManager = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
+      if (file.size > 10 * 1024 * 1024) {
         setModal({
           isOpen: true,
           type: 'error',
           title: 'File Too Large',
-          message: 'Image size should be less than 5MB.'
+          message: 'Image size should be less than 10MB.'
         });
         return;
       }
@@ -245,12 +245,12 @@ const ProfileManager = () => {
   const handleResumeChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
+      if (file.size > 10 * 1024 * 1024) {
         setModal({
           isOpen: true,
           type: 'error',
           title: 'File Too Large',
-          message: 'Resume file size should be less than 5MB.'
+          message: 'Resume file size should be less than 10MB.'
         });
         return;
       }
@@ -379,7 +379,7 @@ const ProfileManager = () => {
               onChange={handleImageChange}
               style={{ display: 'none' }}
             />
-            <p className="image-hint">Max size: 5MB. Recommended: 400x400px</p>
+            <p className="image-hint">Max size: 10MB. Recommended: 400x400px</p>
           </div>
         </div>
         
@@ -451,7 +451,7 @@ const ProfileManager = () => {
             )}
           </div>
           <p className="resume-hint" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
-            Upload your resume as PDF (max 5MB) or enter a link below
+            Upload your resume as PDF (max 10MB) or enter a link below
           </p>
         </div>
         
@@ -515,12 +515,12 @@ const ProjectsManager = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
+      if (file.size > 10 * 1024 * 1024) {
         setModal({
           isOpen: true,
           type: 'error',
           title: 'File Too Large',
-          message: 'Image size should be less than 5MB.'
+          message: 'Image size should be less than 10MB.'
         });
         return;
       }
@@ -724,7 +724,7 @@ const ProjectsManager = () => {
               style={{ display: 'none' }}
             />
             <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '0.5rem 0 1rem' }}>
-              Or enter image URL below (max 5MB)
+              Or enter image URL below (max 10MB)
             </p>
           </div>
 
@@ -857,6 +857,9 @@ const ProjectsManager = () => {
 
 const ContactsManager = () => {
   const [contacts, setContacts] = useState([]);
+  const [modal, setModal] = useState({ isOpen: false, type: '', title: '', message: '' });
+  const [replyModal, setReplyModal] = useState({ isOpen: false, contact: null, message: '' });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchContacts();
@@ -871,22 +874,209 @@ const ContactsManager = () => {
     }
   };
 
+  const handleReply = (contact) => {
+    setReplyModal({
+      isOpen: true,
+      contact: contact,
+      message: `Hi ${contact.name},\n\nThank you for reaching out!\n\n`
+    });
+  };
+
+  const sendReply = async () => {
+    if (!replyModal.message.trim()) {
+      setModal({
+        isOpen: true,
+        type: 'error',
+        title: 'Empty Message',
+        message: 'Please write a reply message.'
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await API.post(`/contacts/${replyModal.contact.id}/reply`, {
+        message: replyModal.message
+      });
+      
+      setModal({
+        isOpen: true,
+        type: 'success',
+        title: 'Reply Sent!',
+        message: `Your reply has been sent to ${replyModal.contact.email}`
+      });
+      
+      setReplyModal({ isOpen: false, contact: null, message: '' });
+      fetchContacts();
+    } catch (error) {
+      setModal({
+        isOpen: true,
+        type: 'error',
+        title: 'Failed to Send',
+        message: error.response?.data?.message || 'Failed to send reply. Please check your email configuration.'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = (id) => {
+    setModal({
+      isOpen: true,
+      type: 'confirm',
+      title: 'Delete Message',
+      message: 'Are you sure you want to delete this message? This action cannot be undone.',
+      onConfirm: async () => {
+        try {
+          await API.delete(`/contacts/${id}`);
+          setModal({
+            isOpen: true,
+            type: 'success',
+            title: 'Deleted!',
+            message: 'Message deleted successfully.'
+          });
+          fetchContacts();
+        } catch (error) {
+          setModal({
+            isOpen: true,
+            type: 'error',
+            title: 'Error',
+            message: 'Failed to delete message. Please try again.'
+          });
+        }
+      }
+    });
+  };
+
   return (
     <div>
       <div className="dashboard-header">
         <h1>Contact Messages</h1>
-        <p>View messages from your portfolio visitors</p>
+        <p>View and respond to messages from your portfolio visitors</p>
       </div>
       <div className="contacts-list">
-        {contacts.map(c => (
-          <div key={c.id} className="contact-item">
-            <div>
-              <h3>{c.name} - {c.email}</h3>
-              <p style={{color: 'var(--text-secondary)', marginTop: '0.5rem'}}>{c.message}</p>
+        {contacts.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>
+            <p>No messages yet.</p>
+          </div>
+        ) : (
+          contacts.map(c => (
+            <div key={c.id} className="contact-item">
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.5rem' }}>
+                  <h3>{c.name}</h3>
+                  <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                    {new Date(c.created_at).toLocaleDateString()}
+                  </span>
+                </div>
+                <p style={{ color: 'var(--accent)', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
+                  {c.email}
+                </p>
+                {c.subject && (
+                  <p style={{ fontWeight: '600', marginBottom: '0.5rem' }}>
+                    Subject: {c.subject}
+                  </p>
+                )}
+                <p style={{ color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
+                  {c.message}
+                </p>
+              </div>
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginTop: '1rem' }}>
+                <button 
+                  onClick={() => handleReply(c)}
+                  style={{
+                    backgroundColor: 'var(--accent)',
+                    color: 'var(--bg-primary)',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '8px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontWeight: '600',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                  </svg>
+                  Reply
+                </button>
+                <button 
+                  onClick={() => handleDelete(c.id)}
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: '#ff4444',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '8px',
+                    border: '1px solid #ff4444',
+                    cursor: 'pointer',
+                    fontWeight: '600'
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Reply Modal */}
+      {replyModal.isOpen && (
+        <div className="modal-overlay" onClick={() => setReplyModal({ isOpen: false, contact: null, message: '' })}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px' }}>
+            <h2>Reply to {replyModal.contact?.name}</h2>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>
+              To: {replyModal.contact?.email}
+            </p>
+            <textarea
+              value={replyModal.message}
+              onChange={(e) => setReplyModal({ ...replyModal, message: e.target.value })}
+              placeholder="Write your reply..."
+              rows="10"
+              style={{
+                width: '100%',
+                padding: '1rem',
+                borderRadius: '8px',
+                border: '2px solid var(--border)',
+                background: 'var(--bg-card)',
+                color: 'var(--text-primary)',
+                fontSize: '1rem',
+                fontFamily: 'inherit',
+                resize: 'vertical'
+              }}
+            />
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+              <button 
+                onClick={sendReply}
+                disabled={loading}
+                className="btn-primary"
+                style={{ flex: 1 }}
+              >
+                {loading ? 'Sending...' : 'Send Reply'}
+              </button>
+              <button 
+                onClick={() => setReplyModal({ isOpen: false, contact: null, message: '' })}
+                className="btn-secondary"
+                style={{ flex: 1 }}
+              >
+                Cancel
+              </button>
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
+
+      <Modal
+        isOpen={modal.isOpen}
+        onClose={() => setModal({ ...modal, isOpen: false })}
+        type={modal.type}
+        title={modal.title}
+        message={modal.message}
+        onConfirm={modal.onConfirm}
+        confirmText={modal.type === 'confirm' ? 'Delete' : 'OK'}
+      />
     </div>
   );
 };
