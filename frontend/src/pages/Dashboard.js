@@ -258,6 +258,16 @@ const ProfileManager = () => {
 const ProjectsManager = () => {
   const [projects, setProjects] = useState([]);
   const [modal, setModal] = useState({ isOpen: false, type: '', title: '', message: '', onConfirm: null });
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    tech_stack: '',
+    github_link: '',
+    live_link: '',
+    image_url: ''
+  });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchProjects();
@@ -269,6 +279,43 @@ const ProjectsManager = () => {
       setProjects(data.data);
     } catch (error) {
       console.error('Error fetching projects:', error);
+    }
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await API.post('/projects', formData);
+      setModal({
+        isOpen: true,
+        type: 'success',
+        title: 'Project Added!',
+        message: 'Your project has been added successfully.'
+      });
+      setFormData({
+        title: '',
+        description: '',
+        tech_stack: '',
+        github_link: '',
+        live_link: '',
+        image_url: ''
+      });
+      setShowAddForm(false);
+      fetchProjects();
+    } catch (error) {
+      setModal({
+        isOpen: true,
+        type: 'error',
+        title: 'Failed to Add',
+        message: error.response?.data?.message || 'Failed to add project. Please try again.'
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -306,16 +353,97 @@ const ProjectsManager = () => {
         <h1>Manage Projects</h1>
         <p>View and manage your portfolio projects</p>
       </div>
+
+      <div style={{ marginBottom: '2rem' }}>
+        <button 
+          className="btn-primary" 
+          onClick={() => setShowAddForm(!showAddForm)}
+          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          {showAddForm ? 'Cancel' : 'Add New Project'}
+        </button>
+      </div>
+
+      {showAddForm && (
+        <form onSubmit={handleSubmit} className="form" style={{ marginBottom: '2rem' }}>
+          <h3 style={{ marginBottom: '1rem', color: 'var(--accent)' }}>Add New Project</h3>
+          <input
+            type="text"
+            name="title"
+            placeholder="Project Title *"
+            value={formData.title}
+            onChange={handleChange}
+            required
+          />
+          <textarea
+            name="description"
+            placeholder="Project Description *"
+            value={formData.description}
+            onChange={handleChange}
+            rows="4"
+            required
+          />
+          <input
+            type="text"
+            name="tech_stack"
+            placeholder="Tech Stack (e.g., React, Node.js, MySQL)"
+            value={formData.tech_stack}
+            onChange={handleChange}
+          />
+          <input
+            type="url"
+            name="github_link"
+            placeholder="GitHub Link (https://...)"
+            value={formData.github_link}
+            onChange={handleChange}
+          />
+          <input
+            type="url"
+            name="live_link"
+            placeholder="Live Demo Link (https://...)"
+            value={formData.live_link}
+            onChange={handleChange}
+          />
+          <input
+            type="url"
+            name="image_url"
+            placeholder="Project Image URL (https://...)"
+            value={formData.image_url}
+            onChange={handleChange}
+          />
+          <button type="submit" className="btn-primary" disabled={loading}>
+            {loading ? 'Adding Project...' : 'Add Project'}
+          </button>
+        </form>
+      )}
+
       <div className="projects-list">
-        {projects.map(p => (
-          <div key={p.id} className="project-item">
-            <div>
-              <h3>{p.title}</h3>
-              <p style={{color: 'var(--text-secondary)', fontSize: '0.9rem'}}>{p.tech_stack}</p>
-            </div>
-            <button onClick={() => deleteProject(p.id)}>Delete</button>
+        {projects.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>
+            <p>No projects yet. Click "Add New Project" to get started!</p>
           </div>
-        ))}
+        ) : (
+          projects.map(p => (
+            <div key={p.id} className="project-item">
+              <div>
+                <h3>{p.title}</h3>
+                <p style={{color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '0.5rem'}}>
+                  {p.description}
+                </p>
+                {p.tech_stack && (
+                  <p style={{color: 'var(--accent)', fontSize: '0.85rem', marginTop: '0.5rem'}}>
+                    {p.tech_stack}
+                  </p>
+                )}
+              </div>
+              <button onClick={() => deleteProject(p.id)}>Delete</button>
+            </div>
+          ))
+        )}
       </div>
       <Modal
         isOpen={modal.isOpen}
@@ -379,6 +507,7 @@ const AdminSettings = () => {
 
   useEffect(() => {
     fetchUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchUserData = async () => {

@@ -56,6 +56,22 @@
   border-left: 3px solid var(--accent);
 }
 
+.back-to-home-link {
+  color: var(--text-secondary) !important;
+  border-left: 3px solid transparent !important;
+}
+
+.back-to-home-link:hover {
+  color: var(--accent) !important;
+  background-color: var(--bg-secondary) !important;
+}
+
+.nav-divider {
+  height: 1px;
+  background-color: var(--border);
+  margin: 0.5rem 1.5rem;
+}
+
 .sidebar-footer {
   padding: 1rem;
   border-top: 1px solid var(--border);
