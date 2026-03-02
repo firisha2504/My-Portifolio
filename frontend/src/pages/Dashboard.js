@@ -354,6 +354,7 @@ const ProjectsManager = () => {
   const [projects, setProjects] = useState([]);
   const [modal, setModal] = useState({ isOpen: false, type: '', title: '', message: '', onConfirm: null });
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editingProject, setEditingProject] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -404,6 +405,34 @@ const ProjectsManager = () => {
     }
   };
 
+  const startEdit = (project) => {
+    setEditingProject(project.id);
+    setFormData({
+      title: project.title,
+      description: project.description,
+      tech_stack: project.tech_stack || '',
+      github_link: project.github_link || '',
+      live_link: project.live_link || '',
+      image_url: project.image_url || ''
+    });
+    setImagePreview(project.image_url);
+    setShowAddForm(false);
+  };
+
+  const cancelEdit = () => {
+    setEditingProject(null);
+    setFormData({
+      title: '',
+      description: '',
+      tech_stack: '',
+      github_link: '',
+      live_link: '',
+      image_url: ''
+    });
+    setImageFile(null);
+    setImagePreview(null);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -421,18 +450,36 @@ const ProjectsManager = () => {
         submitData.append('image_url', formData.image_url);
       }
 
-      await API.post('/projects', submitData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      if (editingProject) {
+        // Update existing project
+        await API.put(`/projects/${editingProject}`, submitData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        setModal({
+          isOpen: true,
+          type: 'success',
+          title: 'Project Updated!',
+          message: 'Your project has been updated successfully.'
+        });
+        cancelEdit();
+      } else {
+        // Create new project
+        await API.post('/projects', submitData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        setModal({
+          isOpen: true,
+          type: 'success',
+          title: 'Project Added!',
+          message: 'Your project has been added successfully.'
+        });
+        setShowAddForm(false);
+      }
       
-      setModal({
-        isOpen: true,
-        type: 'success',
-        title: 'Project Added!',
-        message: 'Your project has been added successfully.'
-      });
       setFormData({
         title: '',
         description: '',
@@ -443,14 +490,13 @@ const ProjectsManager = () => {
       });
       setImageFile(null);
       setImagePreview(null);
-      setShowAddForm(false);
       fetchProjects();
     } catch (error) {
       setModal({
         isOpen: true,
         type: 'error',
-        title: 'Failed to Add',
-        message: error.response?.data?.message || 'Failed to add project. Please try again.'
+        title: editingProject ? 'Failed to Update' : 'Failed to Add',
+        message: error.response?.data?.message || `Failed to ${editingProject ? 'update' : 'add'} project. Please try again.`
       });
     } finally {
       setLoading(false);
@@ -492,23 +538,41 @@ const ProjectsManager = () => {
         <p>View and manage your portfolio projects</p>
       </div>
 
-      <div style={{ marginBottom: '2rem' }}>
-        <button 
-          className="btn-primary" 
-          onClick={() => setShowAddForm(!showAddForm)}
-          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <line x1="12" y1="5" x2="12" y2="19"/>
-            <line x1="5" y1="12" x2="19" y2="12"/>
-          </svg>
-          {showAddForm ? 'Cancel' : 'Add New Project'}
-        </button>
-      </div>
+      {!editingProject && (
+        <div style={{ marginBottom: '2rem' }}>
+          <button 
+            className="btn-primary" 
+            onClick={() => {
+              setShowAddForm(!showAddForm);
+              if (showAddForm) {
+                setFormData({
+                  title: '',
+                  description: '',
+                  tech_stack: '',
+                  github_link: '',
+                  live_link: '',
+                  image_url: ''
+                });
+                setImageFile(null);
+                setImagePreview(null);
+              }
+            }}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            {showAddForm ? 'Cancel' : 'Add New Project'}
+          </button>
+        </div>
+      )}
 
-      {showAddForm && (
+      {(showAddForm || editingProject) && (
         <form onSubmit={handleSubmit} className="form" style={{ marginBottom: '2rem' }}>
-          <h3 style={{ marginBottom: '1rem', color: 'var(--accent)' }}>Add New Project</h3>
+          <h3 style={{ marginBottom: '1rem', color: 'var(--accent)' }}>
+            {editingProject ? 'Edit Project' : 'Add New Project'}
+          </h3>
           
           <div className="project-image-upload">
             {imagePreview && (
@@ -522,7 +586,7 @@ const ProjectsManager = () => {
                 <circle cx="8.5" cy="8.5" r="1.5"/>
                 <polyline points="21 15 16 10 5 21"/>
               </svg>
-              {imageFile ? 'Change Image' : 'Upload Image'}
+              {imageFile ? 'Change Image' : (imagePreview ? 'Change Image' : 'Upload Image')}
             </label>
             <input
               id="project-image-upload"
@@ -581,9 +645,16 @@ const ProjectsManager = () => {
             onChange={handleChange}
             disabled={imageFile !== null}
           />
-          <button type="submit" className="btn-primary" disabled={loading}>
-            {loading ? 'Adding Project...' : 'Add Project'}
-          </button>
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <button type="submit" className="btn-primary" disabled={loading} style={{ flex: 1 }}>
+              {loading ? (editingProject ? 'Updating...' : 'Adding...') : (editingProject ? 'Update Project' : 'Add Project')}
+            </button>
+            {editingProject && (
+              <button type="button" onClick={cancelEdit} className="btn-secondary" style={{ flex: 1 }}>
+                Cancel
+              </button>
+            )}
+          </div>
         </form>
       )}
 
@@ -595,7 +666,7 @@ const ProjectsManager = () => {
         ) : (
           projects.map(p => (
             <div key={p.id} className="project-item">
-              <div>
+              <div style={{ flex: 1 }}>
                 <h3>{p.title}</h3>
                 <p style={{color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '0.5rem'}}>
                   {p.description}
@@ -606,7 +677,39 @@ const ProjectsManager = () => {
                   </p>
                 )}
               </div>
-              <button onClick={() => deleteProject(p.id)}>Delete</button>
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                <button 
+                  onClick={() => startEdit(p)} 
+                  className="btn-edit"
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: 'var(--accent)',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '8px',
+                    border: '1px solid var(--accent)',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    fontWeight: '600'
+                  }}
+                >
+                  Edit
+                </button>
+                <button 
+                  onClick={() => deleteProject(p.id)}
+                  style={{
+                    backgroundColor: '#ff4444',
+                    color: 'white',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '8px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    fontWeight: '600'
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           ))
         )}
