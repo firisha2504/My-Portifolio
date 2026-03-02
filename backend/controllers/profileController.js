@@ -23,7 +23,7 @@ exports.updateProfile = async (req, res, next) => {
     let profile_image = existing.length > 0 ? existing[0].profile_image : null;
     let resume_file = existing.length > 0 ? existing[0].resume_link : resume_link;
 
-    // Handle profile image upload
+    // Handle profile image upload to Cloudinary
     if (req.files && req.files.profile_image) {
       console.log('Uploading profile image to Cloudinary...');
       const result = await cloudinary.uploader.upload(req.files.profile_image[0].path);
@@ -34,15 +34,13 @@ exports.updateProfile = async (req, res, next) => {
       profile_image = result.secure_url;
     }
 
-    // Handle resume PDF upload
+    // Handle resume PDF upload - save locally and serve via backend
     if (req.files && req.files.resume_file) {
-      console.log('Uploading resume PDF to Cloudinary...');
-      const result = await cloudinary.uploader.upload(req.files.resume_file[0].path, {
-        resource_type: 'raw',
-        format: 'pdf'
-      });
-      resume_file = result.secure_url;
-      console.log('Resume uploaded:', resume_file);
+      console.log('Saving resume PDF locally...');
+      const filename = req.files.resume_file[0].filename;
+      // Create URL to serve the file from backend
+      resume_file = `${process.env.CLIENT_URL?.replace('3000', '5000') || 'http://localhost:5000'}/uploads/${filename}`;
+      console.log('Resume saved:', resume_file);
     }
 
     // Use resume_link if provided and no file uploaded
