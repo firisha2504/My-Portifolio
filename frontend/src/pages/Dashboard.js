@@ -191,6 +191,8 @@ const ProfileManager = () => {
   const [loading, setLoading] = useState(false);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [resumeFile, setResumeFile] = useState(null);
+  const [resumeFileName, setResumeFileName] = useState('');
 
   useEffect(() => {
     fetchProfile();
@@ -200,8 +202,19 @@ const ProfileManager = () => {
     try {
       const { data } = await API.get('/profile');
       if (data.data) {
-        setProfile(data.data);
+        setProfile({
+          name: data.data.name || '',
+          title: data.data.title || '',
+          bio: data.data.bio || '',
+          resume_link: data.data.resume_link || ''
+        });
         setImagePreview(data.data.profile_image);
+        // Extract filename from resume URL if exists
+        if (data.data.resume_link) {
+          const urlParts = data.data.resume_link.split('/');
+          const filename = urlParts[urlParts.length - 1];
+          setResumeFileName(filename);
+        }
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -229,6 +242,52 @@ const ProfileManager = () => {
     }
   };
 
+  const handleResumeChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setModal({
+          isOpen: true,
+          type: 'error',
+          title: 'File Too Large',
+          message: 'Resume file size should be less than 5MB.'
+        });
+        return;
+      }
+      if (file.type !== 'application/pdf') {
+        setModal({
+          isOpen: true,
+          type: 'error',
+          title: 'Invalid File Type',
+          message: 'Only PDF files are allowed for resume.'
+        });
+        return;
+      }
+      setResumeFile(file);
+      setResumeFileName(file.name);
+    }
+  };
+
+  const handleRemoveResume = () => {
+    setModal({
+      isOpen: true,
+      type: 'confirm',
+      title: 'Remove Resume',
+      message: 'Are you sure you want to remove the resume? This will clear both uploaded file and link.',
+      onConfirm: () => {
+        setResumeFile(null);
+        setResumeFileName('');
+        setProfile({...profile, resume_link: ''});
+        setModal({
+          isOpen: true,
+          type: 'info',
+          title: 'Resume Removed',
+          message: 'Resume has been removed. Click "Update Profile" to save changes.'
+        });
+      }
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -236,18 +295,30 @@ const ProfileManager = () => {
       const formData = new FormData();
       formData.append('name', profile.name);
       formData.append('title', profile.title);
-      formData.append('bio', profile.bio);
-      formData.append('resume_link', profile.resume_link);
+      formData.append('bio', profile.bio || '');
+      formData.append('resume_link', profile.resume_link || '');
       
       if (imageFile) {
         formData.append('profile_image', imageFile);
       }
 
-      await API.put('/profile', formData, {
+      if (resumeFile) {
+        formData.append('resume_file', resumeFile);
+      }
+
+      console.log('Submitting profile update...');
+      console.log('FormData contents:');
+      for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+
+      const response = await API.put('/profile', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
+      
+      console.log('Response:', response);
       
       setModal({
         isOpen: true,
@@ -256,13 +327,16 @@ const ProfileManager = () => {
         message: 'Profile updated successfully!'
       });
       setImageFile(null);
+      setResumeFile(null);
       fetchProfile();
     } catch (error) {
+      console.error('Error updating profile:', error);
+      console.error('Error response:', error.response);
       setModal({
         isOpen: true,
         type: 'error',
         title: 'Error',
-        message: error.response?.data?.message || 'Failed to update profile. Please try again.'
+        message: error.response?.data?.message || error.message || 'Failed to update profile. Please try again.'
       });
     } finally {
       setLoading(false);
@@ -329,9 +403,61 @@ const ProfileManager = () => {
           onChange={(e) => setProfile({...profile, bio: e.target.value})} 
           rows="5" 
         />
+        
+        <div className="resume-upload-section" style={{ marginTop: '1rem' }}>
+          <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-primary)', fontWeight: '600' }}>
+            Resume (PDF)
+          </label>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <label htmlFor="resume-upload" className="btn-secondary" style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="12" y1="18" x2="12" y2="12"/>
+                <line x1="9" y1="15" x2="15" y2="15"/>
+              </svg>
+              {resumeFile ? 'Change PDF' : (resumeFileName ? 'Change PDF' : 'Upload PDF')}
+            </label>
+            <input
+              id="resume-upload"
+              type="file"
+              accept=".pdf,application/pdf"
+              onChange={handleResumeChange}
+              style={{ display: 'none' }}
+            />
+            {resumeFileName && (
+              <>
+                <span style={{ color: 'var(--accent)', fontSize: '0.9rem' }}>
+                  📄 {resumeFileName}
+                </span>
+                <button 
+                  type="button"
+                  onClick={handleRemoveResume}
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: '#ff4444',
+                    padding: '0.4rem 0.8rem',
+                    borderRadius: '6px',
+                    border: '1px solid #ff4444',
+                    cursor: 'pointer',
+                    fontSize: '0.85rem',
+                    fontWeight: '600',
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  Remove
+                </button>
+              </>
+            )}
+          </div>
+          <p className="resume-hint" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
+            Upload your resume as PDF (max 5MB) or enter a link below
+          </p>
+        </div>
+        
         <input 
           type="text" 
-          placeholder="Resume Link (https://...)" 
+          placeholder="Or Resume Link (https://...)" 
           value={profile.resume_link} 
           onChange={(e) => setProfile({...profile, resume_link: e.target.value})} 
         />
@@ -345,6 +471,8 @@ const ProfileManager = () => {
         type={modal.type}
         title={modal.title}
         message={modal.message}
+        onConfirm={modal.onConfirm}
+        confirmText={modal.type === 'confirm' ? 'Remove' : 'OK'}
       />
     </div>
   );

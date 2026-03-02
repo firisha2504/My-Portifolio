@@ -33,11 +33,12 @@ exports.validateProfile = [
   body('name').trim().notEmpty().withMessage('Name is required'),
   body('title').trim().notEmpty().withMessage('Title is required'),
   body('bio').optional().trim(),
-  body('resume_link').optional({ checkFalsy: true }).isURL().withMessage('Invalid resume URL'),
+  body('resume_link').optional().trim(),
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ success: false, errors: errors.array() });
+      console.error('Validation errors:', errors.array());
+      return res.status(400).json({ success: false, message: errors.array()[0].msg, errors: errors.array() });
     }
     next();
   }

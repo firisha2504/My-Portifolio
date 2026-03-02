@@ -6,6 +6,9 @@ const { validateProfile } = require('../middleware/validation');
 const router = express.Router();
 
 router.get('/', getProfile);
-router.put('/', protect, authorize('admin'), upload.single('profile_image'), validateProfile, updateProfile);
+router.put('/', protect, authorize('admin'), upload.fields([
+  { name: 'profile_image', maxCount: 1 },
+  { name: 'resume_file', maxCount: 1 }
+]), validateProfile, updateProfile);
 
 module.exports = router;
