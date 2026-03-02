@@ -91,6 +91,12 @@ const Login = () => {
           <button type="submit" disabled={loading}>
             {loading ? 'Logging in...' : 'Login'}
           </button>
+          
+          <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+            <Link to="/forgot-password" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.9rem' }}>
+              Forgot Password?
+            </Link>
+          </div>
         </form>
 
         <Modal
