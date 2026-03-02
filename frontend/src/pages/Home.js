@@ -29,7 +29,9 @@ const Home = () => {
       <div className="container">
         <div className="hero">
           {profile?.profile_image && (
-            <img src={profile.profile_image} alt={profile.name} className="profile-pic" />
+            <div className="profile-pic-wrapper">
+              <img src={profile.profile_image} alt={profile.name} className="profile-pic" />
+            </div>
           )}
           <h2>{profile?.title || 'FULL-STACK DEVELOPER'}</h2>
           <h1>Hi, I'm <span>{profile?.name || 'John Doe'}</span></h1>
