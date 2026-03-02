@@ -39,21 +39,30 @@ exports.getProject = async (req, res, next) => {
 
 exports.createProject = async (req, res, next) => {
   try {
+    console.log('Create project request received');
+    console.log('Body:', req.body);
+    console.log('File:', req.file);
+    
     const { title, description, tech_stack, github_link, live_link } = req.body;
     let image_url = req.body.image_url;
 
     if (req.file) {
+      console.log('Uploading image to Cloudinary...');
       const result = await cloudinary.uploader.upload(req.file.path);
       image_url = result.secure_url;
+      console.log('Image uploaded:', image_url);
     }
 
+    console.log('Inserting project into database...');
     const [result] = await db.query(
       'INSERT INTO projects (title, description, tech_stack, github_link, live_link, image_url) VALUES (?, ?, ?, ?, ?, ?)',
       [title, description, tech_stack, github_link, live_link, image_url]
     );
 
+    console.log('Project created successfully');
     res.status(201).json({ success: true, message: 'Project created', id: result.insertId });
   } catch (error) {
+    console.error('Error creating project:', error);
     next(error);
   }
 };

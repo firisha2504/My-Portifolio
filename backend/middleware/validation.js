@@ -4,12 +4,29 @@ exports.validateProject = [
   body('title').trim().notEmpty().withMessage('Title is required'),
   body('description').trim().notEmpty().withMessage('Description is required'),
   body('tech_stack').optional().trim(),
-  body('github_link').optional().isURL().withMessage('Invalid GitHub URL'),
-  body('live_link').optional().isURL().withMessage('Invalid live link URL'),
+  body('github_link').optional({ checkFalsy: true }).custom((value) => {
+    if (!value || value === '') return true;
+    try {
+      new URL(value);
+      return true;
+    } catch {
+      throw new Error('Invalid GitHub URL');
+    }
+  }),
+  body('live_link').optional({ checkFalsy: true }).custom((value) => {
+    if (!value || value === '') return true;
+    try {
+      new URL(value);
+      return true;
+    } catch {
+      throw new Error('Invalid live link URL');
+    }
+  }),
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ success: false, errors: errors.array() });
+      console.error('Validation errors:', errors.array());
+      return res.status(400).json({ success: false, message: errors.array()[0].msg, errors: errors.array() });
     }
     next();
   }
