@@ -33,9 +33,9 @@ const Home = () => {
               <img src={profile.profile_image} alt={profile.name} className="profile-pic" />
             </div>
           )}
-          <h2>{profile?.title || 'FULL-STACK DEVELOPER'}</h2>
-          <h1>Hi, I'm <span>{profile?.name || 'John Doe'}</span></h1>
-          <p>{profile?.bio || 'I craft elegant, scalable web applications with modern technologies. Passionate about clean code, great UX, and solving real-world problems.'}</p>
+          <h2>{profile?.title || 'FULL-STACK DEVELOPER AND GRAPHIC DESIGNER'}</h2>
+          <h1>Hi, I'm <span>{profile?.name || 'FIROMSA ABDI'}</span></h1>
+          <p>{profile?.bio || 'I’m a full-stack developer and graphic designer passionate about building scalable web applications with clean, intuitive design. I bring together strong backend development, modern frontend technologies, and visual creativity to create digital products that are both powerful and user-focused.'}</p>
           <div className="hero-buttons">
             <Link to="/projects" className="btn-primary">View My Work</Link>
             {profile?.resume_link && (
