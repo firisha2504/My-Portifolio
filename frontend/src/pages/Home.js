@@ -67,10 +67,6 @@ const Home = () => {
             <div className="stat-text">Technologies</div>
           </div>
         </div>
-
-        <div className="scroll-indicator">
-          <div className="mouse"></div>
-        </div>
       </div>
     </div>
   );
