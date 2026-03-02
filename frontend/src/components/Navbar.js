@@ -12,7 +12,7 @@ const Navbar = ({ theme, toggleTheme }) => {
           <li><Link to="/about">About</Link></li>
           <li><Link to="/projects">Projects</Link></li>
           <li><Link to="/contact">Contact</Link></li>
-          <li><button onClick={toggleTheme} className="theme-toggle">{theme === 'dark' ? '☀️' : '🌙'}</button></li>
+          <li><button onClick={toggleTheme} className="theme-toggle">{theme === 'light' ? '🌙' : '☀️'}</button></li>
         </ul>
       </div>
     </nav>
