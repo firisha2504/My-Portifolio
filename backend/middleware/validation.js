@@ -33,7 +33,7 @@ exports.validateProfile = [
   body('name').trim().notEmpty().withMessage('Name is required'),
   body('title').trim().notEmpty().withMessage('Title is required'),
   body('bio').optional().trim(),
-  body('resume_link').optional().isURL().withMessage('Invalid resume URL'),
+  body('resume_link').optional({ checkFalsy: true }).isURL().withMessage('Invalid resume URL'),
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

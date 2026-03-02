@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import API from '../utils/api';
+import Modal from '../components/Modal';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -22,6 +23,14 @@ const Dashboard = () => {
       <div className="dashboard-sidebar">
         <h2>Admin Panel</h2>
         <nav>
+          <Link to="/" className="back-to-home-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            Back to Home
+          </Link>
+          <div className="nav-divider"></div>
           <Link to="/dashboard" className={isActive('/dashboard') && location.pathname === '/dashboard' ? 'active' : ''}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="3" y="3" width="7" height="7"/>
@@ -178,6 +187,8 @@ const DashboardOverview = () => {
 
 const ProfileManager = () => {
   const [profile, setProfile] = useState({ name: '', title: '', bio: '', resume_link: '' });
+  const [modal, setModal] = useState({ isOpen: false, type: '', title: '', message: '' });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchProfile();
@@ -196,11 +207,25 @@ const ProfileManager = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       await API.put('/profile', profile);
-      alert('Profile updated successfully!');
+      setModal({
+        isOpen: true,
+        type: 'success',
+        title: 'Success!',
+        message: 'Profile updated successfully!'
+      });
+      fetchProfile();
     } catch (error) {
-      alert('Failed to update profile');
+      setModal({
+        isOpen: true,
+        type: 'error',
+        title: 'Error',
+        message: error.response?.data?.message || 'Failed to update profile. Please try again.'
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -215,14 +240,24 @@ const ProfileManager = () => {
         <input type="text" placeholder="Title" value={profile.title} onChange={(e) => setProfile({...profile, title: e.target.value})} required />
         <textarea placeholder="Bio" value={profile.bio} onChange={(e) => setProfile({...profile, bio: e.target.value})} rows="5" />
         <input type="text" placeholder="Resume Link" value={profile.resume_link} onChange={(e) => setProfile({...profile, resume_link: e.target.value})} />
-        <button type="submit" className="btn-primary">Update Profile</button>
+        <button type="submit" className="btn-primary" disabled={loading}>
+          {loading ? 'Updating...' : 'Update Profile'}
+        </button>
       </form>
+      <Modal
+        isOpen={modal.isOpen}
+        onClose={() => setModal({ ...modal, isOpen: false })}
+        type={modal.type}
+        title={modal.title}
+        message={modal.message}
+      />
     </div>
   );
 };
 
 const ProjectsManager = () => {
   const [projects, setProjects] = useState([]);
+  const [modal, setModal] = useState({ isOpen: false, type: '', title: '', message: '', onConfirm: null });
 
   useEffect(() => {
     fetchProjects();
@@ -238,14 +273,31 @@ const ProjectsManager = () => {
   };
 
   const deleteProject = async (id) => {
-    if (window.confirm('Are you sure you want to delete this project?')) {
-      try {
-        await API.delete(`/projects/${id}`);
-        fetchProjects();
-      } catch (error) {
-        alert('Failed to delete project');
+    setModal({
+      isOpen: true,
+      type: 'confirm',
+      title: 'Delete Project',
+      message: 'Are you sure you want to delete this project? This action cannot be undone.',
+      onConfirm: async () => {
+        try {
+          await API.delete(`/projects/${id}`);
+          setModal({
+            isOpen: true,
+            type: 'success',
+            title: 'Deleted!',
+            message: 'Project deleted successfully.'
+          });
+          fetchProjects();
+        } catch (error) {
+          setModal({
+            isOpen: true,
+            type: 'error',
+            title: 'Error',
+            message: 'Failed to delete project. Please try again.'
+          });
+        }
       }
-    }
+    });
   };
 
   return (
@@ -265,6 +317,15 @@ const ProjectsManager = () => {
           </div>
         ))}
       </div>
+      <Modal
+        isOpen={modal.isOpen}
+        onClose={() => setModal({ ...modal, isOpen: false })}
+        type={modal.type}
+        title={modal.title}
+        message={modal.message}
+        onConfirm={modal.onConfirm}
+        confirmText={modal.type === 'confirm' ? 'Delete' : 'OK'}
+      />
     </div>
   );
 };
@@ -313,7 +374,7 @@ const AdminSettings = () => {
     newPassword: '',
     confirmPassword: ''
   });
-  const [message, setMessage] = useState({ type: '', text: '' });
+  const [modal, setModal] = useState({ isOpen: false, type: '', title: '', message: '' });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -340,10 +401,14 @@ const AdminSettings = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage({ type: '', text: '' });
 
     if (formData.newPassword && formData.newPassword !== formData.confirmPassword) {
-      setMessage({ type: 'error', text: 'New passwords do not match' });
+      setModal({
+        isOpen: true,
+        type: 'error',
+        title: 'Password Mismatch',
+        message: 'New passwords do not match. Please try again.'
+      });
       setLoading(false);
       return;
     }
@@ -356,7 +421,13 @@ const AdminSettings = () => {
         newPassword: formData.newPassword
       });
 
-      setMessage({ type: 'success', text: 'Settings updated successfully!' });
+      setModal({
+        isOpen: true,
+        type: 'success',
+        title: 'Success!',
+        message: 'Your account settings have been updated successfully.'
+      });
+      
       setFormData({ ...formData, currentPassword: '', newPassword: '', confirmPassword: '' });
       
       const user = JSON.parse(localStorage.getItem('user'));
@@ -364,9 +435,11 @@ const AdminSettings = () => {
       user.email = formData.email;
       localStorage.setItem('user', JSON.stringify(user));
     } catch (error) {
-      setMessage({ 
-        type: 'error', 
-        text: error.response?.data?.message || 'Failed to update settings' 
+      setModal({
+        isOpen: true,
+        type: 'error',
+        title: 'Update Failed',
+        message: error.response?.data?.message || 'Failed to update settings. Please check your current password and try again.'
       });
     } finally {
       setLoading(false);
@@ -442,13 +515,14 @@ const AdminSettings = () => {
         <button type="submit" className="btn-primary" disabled={loading}>
           {loading ? 'Saving...' : 'Save Changes'}
         </button>
-
-        {message.text && (
-          <div className={`message ${message.type}`}>
-            {message.text}
-          </div>
-        )}
       </form>
+      <Modal
+        isOpen={modal.isOpen}
+        onClose={() => setModal({ ...modal, isOpen: false })}
+        type={modal.type}
+        title={modal.title}
+        message={modal.message}
+      />
     </div>
   );
 };

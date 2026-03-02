@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import API from '../utils/api';
+import Modal from '../components/Modal';
 import './Contact.css';
 
 const Contact = () => {
   const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
-  const [status, setStatus] = useState({ type: '', message: '' });
+  const [modal, setModal] = useState({ isOpen: false, type: '', title: '', message: '' });
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -14,14 +15,23 @@ const Contact = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setStatus({ type: '', message: '' });
 
     try {
       await API.post('/contacts', formData);
-      setStatus({ type: 'success', message: 'Message sent successfully!' });
+      setModal({
+        isOpen: true,
+        type: 'success',
+        title: 'Message Sent!',
+        message: 'Thank you for reaching out! I will get back to you as soon as possible.'
+      });
       setFormData({ name: '', email: '', subject: '', message: '' });
     } catch (error) {
-      setStatus({ type: 'error', message: error.response?.data?.message || 'Failed to send message' });
+      setModal({
+        isOpen: true,
+        type: 'error',
+        title: 'Failed to Send',
+        message: error.response?.data?.message || 'Failed to send message. Please try again later.'
+      });
     } finally {
       setLoading(false);
     }
@@ -84,8 +94,14 @@ const Contact = () => {
             <input type="text" name="subject" placeholder="Subject" value={formData.subject} onChange={handleChange} />
             <textarea name="message" placeholder="Your Message" rows="6" value={formData.message} onChange={handleChange} required />
             <button type="submit" disabled={loading}>{loading ? 'Sending...' : 'Send Message'}</button>
-            {status.message && <div className={status.type}>{status.message}</div>}
           </form>
+          <Modal
+            isOpen={modal.isOpen}
+            onClose={() => setModal({ ...modal, isOpen: false })}
+            type={modal.type}
+            title={modal.title}
+            message={modal.message}
+          />
         </div>
       </div>
     </div>

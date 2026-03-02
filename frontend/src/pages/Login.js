@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import API from '../utils/api';
+import Modal from '../components/Modal';
 import './Login.css';
 
 const Login = () => {
   const [formData, setFormData] = useState({ username: '', password: '' });
-  const [error, setError] = useState('');
+  const [modal, setModal] = useState({ isOpen: false, type: '', title: '', message: '' });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -16,7 +17,6 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
 
     try {
       const { data } = await API.post('/auth/login', formData);
@@ -24,7 +24,12 @@ const Login = () => {
       localStorage.setItem('user', JSON.stringify(data.user));
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+      setModal({
+        isOpen: true,
+        type: 'error',
+        title: 'Login Failed',
+        message: err.response?.data?.message || 'Invalid credentials. Please check your username and password.'
+      });
     } finally {
       setLoading(false);
     }
@@ -86,9 +91,15 @@ const Login = () => {
           <button type="submit" disabled={loading}>
             {loading ? 'Logging in...' : 'Login'}
           </button>
-
-          {error && <div className="error">{error}</div>}
         </form>
+
+        <Modal
+          isOpen={modal.isOpen}
+          onClose={() => setModal({ ...modal, isOpen: false })}
+          type={modal.type}
+          title={modal.title}
+          message={modal.message}
+        />
 
         <div className="back-home">
           <Link to="/">← Back to Home</Link>
