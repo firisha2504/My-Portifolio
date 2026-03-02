@@ -13,14 +13,16 @@ exports.getProfile = async (req, res, next) => {
 exports.updateProfile = async (req, res, next) => {
   try {
     const { name, title, bio, resume_link } = req.body;
-    let profile_image = req.body.profile_image;
+    
+    // Get existing profile to preserve image if not uploading new one
+    const [existing] = await db.query('SELECT * FROM profile LIMIT 1');
+    let profile_image = existing.length > 0 ? existing[0].profile_image : null;
 
+    // If new file is uploaded, use it
     if (req.file) {
       const result = await cloudinary.uploader.upload(req.file.path);
       profile_image = result.secure_url;
     }
-
-    const [existing] = await db.query('SELECT id FROM profile LIMIT 1');
 
     if (existing.length === 0) {
       await db.query(

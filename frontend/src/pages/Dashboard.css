@@ -1,7 +1,7 @@
 .dashboard {
   display: flex;
   min-height: 100vh;
-  background-color: var(--bg-primary);
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
 }
 
 .dashboard-sidebar {
@@ -11,15 +11,21 @@
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
   height: 100vh;
+  overflow-y: auto;
+  z-index: 100;
 }
 
 .dashboard-sidebar h2 {
   padding: 0 2rem 2rem;
   font-size: 1.5rem;
-  color: var(--accent);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   border-bottom: 1px solid var(--border);
   margin-bottom: 1rem;
 }
@@ -98,7 +104,9 @@
 .dashboard-content {
   flex: 1;
   padding: 2rem;
+  margin-left: 280px;
   overflow-y: auto;
+  min-height: 100vh;
 }
 
 .dashboard-header {
@@ -342,4 +350,208 @@
 .settings-form .btn-primary {
   width: 100%;
   margin-top: 1rem;
+}
+
+/* Profile Image Upload Styles */
+.profile-image-section {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
+  background-color: var(--bg-secondary);
+  border-radius: 12px;
+  border: 2px dashed var(--border);
+  margin-bottom: 1.5rem;
+}
+
+.image-preview-container {
+  flex-shrink: 0;
+}
+
+.profile-image-preview {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid var(--accent);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.profile-image-placeholder {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background-color: var(--bg-card);
+  border: 3px dashed var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+}
+
+.image-upload-controls {
+  flex: 1;
+}
+
+.image-upload-controls .btn-secondary {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+}
+
+.image-upload-controls .btn-secondary:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 215, 0, 0.2);
+}
+
+.image-hint {
+  margin-top: 1rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+/* Enhanced Dashboard Header */
+.dashboard-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid var(--border);
+}
+
+.dashboard-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Enhanced Stat Cards */
+.stat-card {
+  background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+  padding: 2rem;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-hover) 100%);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover::before {
+  transform: scaleX(1);
+}
+
+.stat-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 40px rgba(255, 215, 0, 0.3);
+  border-color: var(--accent);
+}
+
+/* Enhanced Form Styling */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 800px;
+  background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+  padding: 2.5rem;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced Project/Contact Items */
+.project-item,
+.contact-item {
+  background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.project-item::before,
+.contact-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--accent);
+  transform: scaleY(0);
+  transition: transform 0.3s ease;
+}
+
+.project-item:hover::before,
+.contact-item:hover::before {
+  transform: scaleY(1);
+}
+
+.project-item:hover,
+.contact-item:hover {
+  border-color: var(--accent);
+  transform: translateX(8px);
+  box-shadow: 0 8px 25px rgba(255, 215, 0, 0.2);
+}
+
+/* Scrollbar Styling */
+.dashboard-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dashboard-sidebar::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+.dashboard-sidebar::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 3px;
+}
+
+.dashboard-sidebar::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-hover);
+}
+
+/* Responsive adjustments */
+@media (max-width: 968px) {
+  .dashboard-sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+  }
+  
+  .dashboard-content {
+    margin-left: 0;
+  }
+  
+  .profile-image-section {
+    flex-direction: column;
+    text-align: center;
+  }
 }

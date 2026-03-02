@@ -189,6 +189,8 @@ const ProfileManager = () => {
   const [profile, setProfile] = useState({ name: '', title: '', bio: '', resume_link: '' });
   const [modal, setModal] = useState({ isOpen: false, type: '', title: '', message: '' });
   const [loading, setLoading] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
   useEffect(() => {
     fetchProfile();
@@ -199,9 +201,31 @@ const ProfileManager = () => {
       const { data } = await API.get('/profile');
       if (data.data) {
         setProfile(data.data);
+        setImagePreview(data.data.profile_image);
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
+    }
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setModal({
+          isOpen: true,
+          type: 'error',
+          title: 'File Too Large',
+          message: 'Image size should be less than 5MB.'
+        });
+        return;
+      }
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -209,13 +233,29 @@ const ProfileManager = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await API.put('/profile', profile);
+      const formData = new FormData();
+      formData.append('name', profile.name);
+      formData.append('title', profile.title);
+      formData.append('bio', profile.bio);
+      formData.append('resume_link', profile.resume_link);
+      
+      if (imageFile) {
+        formData.append('profile_image', imageFile);
+      }
+
+      await API.put('/profile', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
       setModal({
         isOpen: true,
         type: 'success',
         title: 'Success!',
         message: 'Profile updated successfully!'
       });
+      setImageFile(null);
       fetchProfile();
     } catch (error) {
       setModal({
@@ -236,10 +276,65 @@ const ProfileManager = () => {
         <p>Update your portfolio information</p>
       </div>
       <form onSubmit={handleSubmit} className="form">
-        <input type="text" placeholder="Name" value={profile.name} onChange={(e) => setProfile({...profile, name: e.target.value})} required />
-        <input type="text" placeholder="Title" value={profile.title} onChange={(e) => setProfile({...profile, title: e.target.value})} required />
-        <textarea placeholder="Bio" value={profile.bio} onChange={(e) => setProfile({...profile, bio: e.target.value})} rows="5" />
-        <input type="text" placeholder="Resume Link" value={profile.resume_link} onChange={(e) => setProfile({...profile, resume_link: e.target.value})} />
+        <div className="profile-image-section">
+          <div className="image-preview-container">
+            {imagePreview ? (
+              <img src={imagePreview} alt="Profile" className="profile-image-preview" />
+            ) : (
+              <div className="profile-image-placeholder">
+                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              </div>
+            )}
+          </div>
+          <div className="image-upload-controls">
+            <label htmlFor="profile-image-upload" className="btn-secondary" style={{ cursor: 'pointer', display: 'inline-block' }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ display: 'inline', marginRight: '8px' }}>
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              Upload Image
+            </label>
+            <input
+              id="profile-image-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              style={{ display: 'none' }}
+            />
+            <p className="image-hint">Max size: 5MB. Recommended: 400x400px</p>
+          </div>
+        </div>
+        
+        <input 
+          type="text" 
+          placeholder="Name *" 
+          value={profile.name} 
+          onChange={(e) => setProfile({...profile, name: e.target.value})} 
+          required 
+        />
+        <input 
+          type="text" 
+          placeholder="Title *" 
+          value={profile.title} 
+          onChange={(e) => setProfile({...profile, title: e.target.value})} 
+          required 
+        />
+        <textarea 
+          placeholder="Bio" 
+          value={profile.bio} 
+          onChange={(e) => setProfile({...profile, bio: e.target.value})} 
+          rows="5" 
+        />
+        <input 
+          type="text" 
+          placeholder="Resume Link (https://...)" 
+          value={profile.resume_link} 
+          onChange={(e) => setProfile({...profile, resume_link: e.target.value})} 
+        />
         <button type="submit" className="btn-primary" disabled={loading}>
           {loading ? 'Updating...' : 'Update Profile'}
         </button>
@@ -268,6 +363,8 @@ const ProjectsManager = () => {
     image_url: ''
   });
   const [loading, setLoading] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
   useEffect(() => {
     fetchProjects();
@@ -286,11 +383,50 @@ const ProjectsManager = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setModal({
+          isOpen: true,
+          type: 'error',
+          title: 'File Too Large',
+          message: 'Image size should be less than 5MB.'
+        });
+        return;
+      }
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await API.post('/projects', formData);
+      const submitData = new FormData();
+      submitData.append('title', formData.title);
+      submitData.append('description', formData.description);
+      submitData.append('tech_stack', formData.tech_stack);
+      submitData.append('github_link', formData.github_link);
+      submitData.append('live_link', formData.live_link);
+      
+      if (imageFile) {
+        submitData.append('image', imageFile);
+      } else if (formData.image_url) {
+        submitData.append('image_url', formData.image_url);
+      }
+
+      await API.post('/projects', submitData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
       setModal({
         isOpen: true,
         type: 'success',
@@ -305,6 +441,8 @@ const ProjectsManager = () => {
         live_link: '',
         image_url: ''
       });
+      setImageFile(null);
+      setImagePreview(null);
       setShowAddForm(false);
       fetchProjects();
     } catch (error) {
@@ -371,6 +509,33 @@ const ProjectsManager = () => {
       {showAddForm && (
         <form onSubmit={handleSubmit} className="form" style={{ marginBottom: '2rem' }}>
           <h3 style={{ marginBottom: '1rem', color: 'var(--accent)' }}>Add New Project</h3>
+          
+          <div className="project-image-upload">
+            {imagePreview && (
+              <div style={{ marginBottom: '1rem' }}>
+                <img src={imagePreview} alt="Preview" style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '8px' }} />
+              </div>
+            )}
+            <label htmlFor="project-image-upload" className="btn-secondary" style={{ cursor: 'pointer', display: 'inline-block', marginBottom: '1rem' }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ display: 'inline', marginRight: '8px' }}>
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21 15 16 10 5 21"/>
+              </svg>
+              {imageFile ? 'Change Image' : 'Upload Image'}
+            </label>
+            <input
+              id="project-image-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              style={{ display: 'none' }}
+            />
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '0.5rem 0 1rem' }}>
+              Or enter image URL below (max 5MB)
+            </p>
+          </div>
+
           <input
             type="text"
             name="title"
@@ -411,9 +576,10 @@ const ProjectsManager = () => {
           <input
             type="url"
             name="image_url"
-            placeholder="Project Image URL (https://...)"
+            placeholder="Or paste Project Image URL (https://...)"
             value={formData.image_url}
             onChange={handleChange}
+            disabled={imageFile !== null}
           />
           <button type="submit" className="btn-primary" disabled={loading}>
             {loading ? 'Adding Project...' : 'Add Project'}
