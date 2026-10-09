@@ -51,7 +51,7 @@ cp ../.env.example .env
 Update `.env` with your credentials:
 - Database credentials
 - JWT secret
-- Cloudinary credentials (optional)
+- Cloudinary credentials (optional - if not configured, images will be stored locally)
 
 Generate admin password hash:
 ```bash
@@ -114,6 +114,28 @@ npm start
 - Input validation
 - Protected routes
 - Environment variables
+
+## Image Upload Configuration
+
+This application supports two image storage options:
+
+### Option 1: Local Storage (Default)
+Images are automatically stored locally in the `backend/uploads` folder and served via the backend server. This works out of the box with no additional configuration needed.
+
+### Option 2: Cloudinary (Recommended for Production)
+For production environments, Cloudinary is recommended for better performance and scalability:
+
+1. Sign up for a free account at [cloudinary.com](https://cloudinary.com)
+2. Get your credentials from the Cloudinary dashboard
+3. Update your `.env` file:
+   ```
+   CLOUDINARY_CLOUD_NAME=your_actual_cloud_name
+   CLOUDINARY_API_KEY=your_actual_api_key
+   CLOUDINARY_API_SECRET=your_actual_api_secret
+   ```
+4. Restart your backend server
+
+The application will automatically detect if Cloudinary is configured and use it; otherwise, it falls back to local storage.
 
 ## Deployment
 

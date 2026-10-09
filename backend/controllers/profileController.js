@@ -23,15 +23,34 @@ exports.updateProfile = async (req, res, next) => {
     let profile_image = existing.length > 0 ? existing[0].profile_image : null;
     let resume_file = existing.length > 0 ? existing[0].resume_link : resume_link;
 
-    // Handle profile image upload to Cloudinary
+    // Check if Cloudinary is configured
+    const isCloudinaryConfigured = 
+      process.env.CLOUDINARY_CLOUD_NAME && 
+      process.env.CLOUDINARY_API_KEY && 
+      process.env.CLOUDINARY_API_SECRET &&
+      process.env.CLOUDINARY_CLOUD_NAME !== 'your_cloud_name';
+
+    // Handle profile image upload
     if (req.files && req.files.profile_image) {
-      console.log('Uploading profile image to Cloudinary...');
-      const result = await cloudinary.uploader.upload(req.files.profile_image[0].path);
-      profile_image = result.secure_url;
-      console.log('Profile image uploaded:', profile_image);
+      if (isCloudinaryConfigured) {
+        console.log('Uploading profile image to Cloudinary...');
+        const result = await cloudinary.uploader.upload(req.files.profile_image[0].path);
+        profile_image = result.secure_url;
+        console.log('Profile image uploaded:', profile_image);
+      } else {
+        console.log('Cloudinary not configured, saving image locally...');
+        const filename = req.files.profile_image[0].filename;
+        profile_image = `${process.env.CLIENT_URL?.replace('3000', '5000') || 'http://localhost:5000'}/uploads/${filename}`;
+        console.log('Profile image saved locally:', profile_image);
+      }
     } else if (req.file && req.file.fieldname === 'profile_image') {
-      const result = await cloudinary.uploader.upload(req.file.path);
-      profile_image = result.secure_url;
+      if (isCloudinaryConfigured) {
+        const result = await cloudinary.uploader.upload(req.file.path);
+        profile_image = result.secure_url;
+      } else {
+        const filename = req.file.filename;
+        profile_image = `${process.env.CLIENT_URL?.replace('3000', '5000') || 'http://localhost:5000'}/uploads/${filename}`;
+      }
     }
 
     // Handle resume PDF upload - save locally and serve via backend

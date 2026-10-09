@@ -46,11 +46,25 @@ exports.createProject = async (req, res, next) => {
     const { title, description, tech_stack, github_link, live_link } = req.body;
     let image_url = req.body.image_url;
 
+    // Check if Cloudinary is configured
+    const isCloudinaryConfigured = 
+      process.env.CLOUDINARY_CLOUD_NAME && 
+      process.env.CLOUDINARY_API_KEY && 
+      process.env.CLOUDINARY_API_SECRET &&
+      process.env.CLOUDINARY_CLOUD_NAME !== 'your_cloud_name';
+
     if (req.file) {
-      console.log('Uploading image to Cloudinary...');
-      const result = await cloudinary.uploader.upload(req.file.path);
-      image_url = result.secure_url;
-      console.log('Image uploaded:', image_url);
+      if (isCloudinaryConfigured) {
+        console.log('Uploading image to Cloudinary...');
+        const result = await cloudinary.uploader.upload(req.file.path);
+        image_url = result.secure_url;
+        console.log('Image uploaded:', image_url);
+      } else {
+        console.log('Cloudinary not configured, saving image locally...');
+        const filename = req.file.filename;
+        image_url = `${process.env.CLIENT_URL?.replace('3000', '5000') || 'http://localhost:5000'}/uploads/${filename}`;
+        console.log('Image saved locally:', image_url);
+      }
     }
 
     console.log('Inserting project into database...');
@@ -72,9 +86,21 @@ exports.updateProject = async (req, res, next) => {
     const { title, description, tech_stack, github_link, live_link } = req.body;
     let image_url = req.body.image_url;
 
+    // Check if Cloudinary is configured
+    const isCloudinaryConfigured = 
+      process.env.CLOUDINARY_CLOUD_NAME && 
+      process.env.CLOUDINARY_API_KEY && 
+      process.env.CLOUDINARY_API_SECRET &&
+      process.env.CLOUDINARY_CLOUD_NAME !== 'your_cloud_name';
+
     if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path);
-      image_url = result.secure_url;
+      if (isCloudinaryConfigured) {
+        const result = await cloudinary.uploader.upload(req.file.path);
+        image_url = result.secure_url;
+      } else {
+        const filename = req.file.filename;
+        image_url = `${process.env.CLIENT_URL?.replace('3000', '5000') || 'http://localhost:5000'}/uploads/${filename}`;
+      }
     }
 
     await db.query(
