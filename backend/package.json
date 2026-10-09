@@ -6,7 +6,8 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "seed": "node scripts/seedDatabase.js",
-    "hash": "node utils/generateHash.js"
+    "hash": "node utils/generateHash.js",
+    "setup-skills": "node setup-skills.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
