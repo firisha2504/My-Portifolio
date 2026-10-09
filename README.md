@@ -10,6 +10,7 @@ Production-ready portfolio website built with React, Node.js, Express, and MySQL
 - Admin dashboard with authentication
 - Profile management with image upload
 - Projects CRUD with pagination
+- **Skills management system** - Add, edit, delete skills from dashboard
 - Contact form with database storage
 - JWT authentication & role-based access
 - Dark/Light theme toggle
@@ -98,6 +99,14 @@ npm start
 - `POST /api/projects` - Create project (admin only)
 - `PUT /api/projects/:id` - Update project (admin only)
 - `DELETE /api/projects/:id` - Delete project (admin only)
+
+### Skills
+- `GET /api/skills` - Get all skills grouped by category (public)
+- `GET /api/skills/all` - Get all skills flat list (admin only)
+- `GET /api/skills/categories` - Get unique categories (public)
+- `POST /api/skills` - Create skill (admin only)
+- `PUT /api/skills/:id` - Update skill (admin only)
+- `DELETE /api/skills/:id` - Delete skill (admin only)
 
 ### Contacts
 - `POST /api/contacts` - Submit contact form

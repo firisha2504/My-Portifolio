@@ -60,3 +60,18 @@ exports.validateProfile = [
     next();
   }
 ];
+
+exports.validateSkill = [
+  body('category').trim().notEmpty().withMessage('Category is required'),
+  body('skill_name').trim().notEmpty().withMessage('Skill name is required'),
+  body('category_icon').optional().trim(),
+  body('display_order').optional().isInt({ min: 0 }).withMessage('Display order must be a positive number'),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      console.error('Validation errors:', errors.array());
+      return res.status(400).json({ success: false, message: errors.array()[0].msg, errors: errors.array() });
+    }
+    next();
+  }
+];

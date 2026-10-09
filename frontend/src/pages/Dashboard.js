@@ -53,6 +53,12 @@ const Dashboard = () => {
             </svg>
             Projects
           </Link>
+          <Link to="/dashboard/skills" className={isActive('/dashboard/skills') ? 'active' : ''}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+            </svg>
+            Skills
+          </Link>
           <Link to="/dashboard/contacts" className={isActive('/dashboard/contacts') ? 'active' : ''}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
@@ -84,6 +90,7 @@ const Dashboard = () => {
           <Route path="/" element={<DashboardOverview />} />
           <Route path="/profile" element={<ProfileManager />} />
           <Route path="/projects" element={<ProjectsManager />} />
+          <Route path="/skills" element={<SkillsManager />} />
           <Route path="/contacts" element={<ContactsManager />} />
           <Route path="/settings" element={<AdminSettings />} />
         </Routes>
@@ -1238,6 +1245,361 @@ const AdminSettings = () => {
         type={modal.type}
         title={modal.title}
         message={modal.message}
+      />
+    </div>
+  );
+};
+
+const SkillsManager = () => {
+  const [skills, setSkills] = useState([]);
+  const [modal, setModal] = useState({ isOpen: false, type: '', title: '', message: '', onConfirm: null });
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [editingSkill, setEditingSkill] = useState(null);
+  const [formData, setFormData] = useState({
+    category: '',
+    category_icon: '',
+    skill_name: '',
+    display_order: 0
+  });
+  const [loading, setLoading] = useState(false);
+
+  // Predefined categories with icons
+  const predefinedCategories = [
+    { name: 'Frontend', icon: '💻' },
+    { name: 'Backend', icon: '⚙️' },
+    { name: 'Database', icon: '🗄️' },
+    { name: 'DevOps', icon: '🚀' },
+    { name: 'Mobile', icon: '📱' },
+    { name: 'Tools', icon: '🛠️' },
+    { name: 'Design', icon: '🎨' },
+    { name: 'Testing', icon: '🧪' },
+    { name: 'Cloud', icon: '☁️' },
+    { name: 'Security', icon: '🔒' }
+  ];
+
+  useEffect(() => {
+    fetchSkills();
+  }, []);
+
+  const fetchSkills = async () => {
+    try {
+      const { data } = await API.get('/skills/all');
+      setSkills(data.data);
+    } catch (error) {
+      console.error('Error fetching skills:', error);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    
+    // Auto-fill icon when category is selected
+    if (name === 'category') {
+      const category = predefinedCategories.find(c => c.name === value);
+      if (category) {
+        setFormData(prev => ({ ...prev, category_icon: category.icon }));
+      }
+    }
+  };
+
+  const startEdit = (skill) => {
+    setEditingSkill(skill.id);
+    setFormData({
+      category: skill.category,
+      category_icon: skill.category_icon,
+      skill_name: skill.skill_name,
+      display_order: skill.display_order || 0
+    });
+    setShowAddForm(false);
+  };
+
+  const cancelEdit = () => {
+    setEditingSkill(null);
+    setFormData({
+      category: '',
+      category_icon: '',
+      skill_name: '',
+      display_order: 0
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      if (editingSkill) {
+        await API.put(`/skills/${editingSkill}`, formData);
+        setModal({
+          isOpen: true,
+          type: 'success',
+          title: 'Skill Updated!',
+          message: 'The skill has been updated successfully.'
+        });
+        cancelEdit();
+      } else {
+        await API.post('/skills', formData);
+        setModal({
+          isOpen: true,
+          type: 'success',
+          title: 'Skill Added!',
+          message: 'The skill has been added successfully.'
+        });
+        setShowAddForm(false);
+      }
+      
+      setFormData({
+        category: '',
+        category_icon: '',
+        skill_name: '',
+        display_order: 0
+      });
+      fetchSkills();
+    } catch (error) {
+      setModal({
+        isOpen: true,
+        type: 'error',
+        title: editingSkill ? 'Failed to Update' : 'Failed to Add',
+        message: error.response?.data?.message || `Failed to ${editingSkill ? 'update' : 'add'} skill. Please try again.`
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteSkill = async (id) => {
+    setModal({
+      isOpen: true,
+      type: 'confirm',
+      title: 'Delete Skill',
+      message: 'Are you sure you want to delete this skill? This action cannot be undone.',
+      onConfirm: async () => {
+        try {
+          await API.delete(`/skills/${id}`);
+          setModal({
+            isOpen: true,
+            type: 'success',
+            title: 'Deleted!',
+            message: 'Skill deleted successfully.'
+          });
+          fetchSkills();
+        } catch (error) {
+          setModal({
+            isOpen: true,
+            type: 'error',
+            title: 'Error',
+            message: 'Failed to delete skill. Please try again.'
+          });
+        }
+      }
+    });
+  };
+
+  // Group skills by category for display
+  const skillsByCategory = skills.reduce((acc, skill) => {
+    if (!acc[skill.category]) {
+      acc[skill.category] = [];
+    }
+    acc[skill.category].push(skill);
+    return acc;
+  }, {});
+
+  return (
+    <div>
+      <div className="dashboard-header">
+        <h1>Manage Skills</h1>
+        <p>Add, edit, or remove skills from your portfolio</p>
+      </div>
+
+      {!editingSkill && (
+        <div style={{ marginBottom: '2rem' }}>
+          <button 
+            className="btn-primary" 
+            onClick={() => {
+              setShowAddForm(!showAddForm);
+              if (showAddForm) {
+                setFormData({
+                  category: '',
+                  category_icon: '',
+                  skill_name: '',
+                  display_order: 0
+                });
+              }
+            }}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            {showAddForm ? 'Cancel' : 'Add New Skill'}
+          </button>
+        </div>
+      )}
+
+      {(showAddForm || editingSkill) && (
+        <form onSubmit={handleSubmit} className="form" style={{ marginBottom: '2rem' }}>
+          <h3 style={{ marginBottom: '1rem', color: 'var(--accent)' }}>
+            {editingSkill ? 'Edit Skill' : 'Add New Skill'}
+          </h3>
+          
+          <div className="form-group">
+            <label>Category *</label>
+            <select
+              name="category"
+              value={formData.category}
+              onChange={handleChange}
+              required
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                borderRadius: '8px',
+                border: '1px solid var(--border)',
+                backgroundColor: 'var(--bg-secondary)',
+                color: 'var(--text-primary)',
+                fontSize: '1rem'
+              }}
+            >
+              <option value="">Select a category</option>
+              {predefinedCategories.map(cat => (
+                <option key={cat.name} value={cat.name}>
+                  {cat.icon} {cat.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <input
+            type="text"
+            name="category_icon"
+            placeholder="Category Icon (e.g., 💻)"
+            value={formData.category_icon}
+            onChange={handleChange}
+            required
+          />
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '-0.5rem', marginBottom: '1rem' }}>
+            Emoji icons work best. Auto-filled when category is selected.
+          </p>
+
+          <input
+            type="text"
+            name="skill_name"
+            placeholder="Skill Name * (e.g., React.js, Node.js)"
+            value={formData.skill_name}
+            onChange={handleChange}
+            required
+          />
+
+          <input
+            type="number"
+            name="display_order"
+            placeholder="Display Order (0-100)"
+            value={formData.display_order}
+            onChange={handleChange}
+            min="0"
+          />
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '-0.5rem', marginBottom: '1rem' }}>
+            Lower numbers appear first within the category
+          </p>
+
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <button type="submit" className="btn-primary" disabled={loading} style={{ flex: 1 }}>
+              {loading ? (editingSkill ? 'Updating...' : 'Adding...') : (editingSkill ? 'Update Skill' : 'Add Skill')}
+            </button>
+            {editingSkill && (
+              <button type="button" onClick={cancelEdit} className="btn-secondary" style={{ flex: 1 }}>
+                Cancel
+              </button>
+            )}
+          </div>
+        </form>
+      )}
+
+      <div className="skills-by-category">
+        {Object.keys(skillsByCategory).length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>
+            <p>No skills yet. Click "Add New Skill" to get started!</p>
+          </div>
+        ) : (
+          Object.entries(skillsByCategory).map(([category, categorySkills]) => (
+            <div key={category} style={{ marginBottom: '2rem' }}>
+              <h3 style={{ color: 'var(--accent)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span style={{ fontSize: '1.5rem' }}>{categorySkills[0].category_icon}</span>
+                {category}
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 'normal' }}>
+                  ({categorySkills.length} skills)
+                </span>
+              </h3>
+              <div className="skills-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem' }}>
+                {categorySkills
+                  .sort((a, b) => a.display_order - b.display_order)
+                  .map(skill => (
+                    <div 
+                      key={skill.id} 
+                      className="skill-card"
+                      style={{
+                        padding: '1rem',
+                        borderRadius: '8px',
+                        backgroundColor: 'var(--bg-secondary)',
+                        border: '1px solid var(--border)',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }}
+                    >
+                      <div>
+                        <p style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{skill.skill_name}</p>
+                        <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
+                          Order: {skill.display_order}
+                        </p>
+                      </div>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button 
+                          onClick={() => startEdit(skill)}
+                          style={{
+                            backgroundColor: 'transparent',
+                            color: 'var(--accent)',
+                            padding: '0.5rem',
+                            borderRadius: '6px',
+                            border: '1px solid var(--accent)',
+                            cursor: 'pointer',
+                            fontSize: '0.85rem'
+                          }}
+                          title="Edit"
+                        >
+                          ✏️
+                        </button>
+                        <button 
+                          onClick={() => deleteSkill(skill.id)}
+                          style={{
+                            backgroundColor: '#ff4444',
+                            color: 'white',
+                            padding: '0.5rem',
+                            borderRadius: '6px',
+                            border: 'none',
+                            cursor: 'pointer',
+                            fontSize: '0.85rem'
+                          }}
+                          title="Delete"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+      <Modal
+        isOpen={modal.isOpen}
+        onClose={() => setModal({ ...modal, isOpen: false })}
+        type={modal.type}
+        title={modal.title}
+        message={modal.message}
+        onConfirm={modal.onConfirm}
+        confirmText={modal.type === 'confirm' ? 'Delete' : 'OK'}
       />
     </div>
   );
