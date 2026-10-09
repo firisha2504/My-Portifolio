@@ -72,7 +72,7 @@ const About = () => {
         
         <section className="about-content">
           <div className="about-text">
-            <p>I’m a full-stack developer and graphic designer with over five years of experience building web applications that are fast, accessible, and scalable. I specialize in the JavaScript ecosystem, working with React on the frontend and Node.js on the backend, while applying strong design principles to create clean, user-focused interfaces.
+            <p>I’m a full-stack developer with over five years of experience building web applications that are fast, accessible, and scalable. I specialize in the JavaScript ecosystem, working with React on the frontend and Node.js on the backend, while applying strong design principles to create clean, user-focused interfaces.
 
 Beyond development, I’m passionate about visual design and crafting digital experiences that balance performance with aesthetics. When I’m not coding or designing, you’ll find me exploring new technologies, contributing to open-source projects, or writing technical articles. I believe in continuous learning and sharing knowledge with the community.</p>
           </div>

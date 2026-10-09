@@ -53,6 +53,10 @@ exports.replyToContact = async (req, res, next) => {
     const { id } = req.params;
     const { message } = req.body;
 
+    if (!message || message.trim() === '') {
+      return res.status(400).json({ success: false, message: 'Reply message is required' });
+    }
+
     // Get contact details
     const [contacts] = await db.query('SELECT * FROM contacts WHERE id = ?', [id]);
     
@@ -61,29 +65,67 @@ exports.replyToContact = async (req, res, next) => {
     }
 
     const contact = contacts[0];
-    const { sendEmail } = require('../config/email');
 
-    // Send reply email
-    const subject = `Re: ${contact.subject || 'Your message'}`;
-    const htmlMessage = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #333;">Hello ${contact.name},</h2>
-        <p style="color: #666; line-height: 1.6;">${message.replace(/\n/g, '<br>')}</p>
-        <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-        <p style="color: #999; font-size: 12px;">
-          This is a reply to your message: "${contact.message.substring(0, 100)}${contact.message.length > 100 ? '...' : ''}"
-        </p>
-      </div>
-    `;
+    // Check if email is configured
+    const isEmailConfigured = 
+      process.env.EMAIL_USER && 
+      process.env.EMAIL_PASSWORD &&
+      process.env.EMAIL_USER !== 'your_email@gmail.com';
 
-    await sendEmail(contact.email, subject, message, htmlMessage);
+    if (!isEmailConfigured) {
+      console.warn('Email not configured. Reply logged but not sent.');
+      
+      // Mark as read even if email isn't sent
+      await db.query('UPDATE contacts SET is_read = TRUE WHERE id = ?', [id]);
+      
+      return res.json({ 
+        success: true, 
+        message: 'Reply logged successfully. Note: Email sending is not configured. Configure EMAIL_USER and EMAIL_PASSWORD in .env to send replies via email.',
+        emailSent: false
+      });
+    }
 
-    // Mark as read
-    await db.query('UPDATE contacts SET is_read = TRUE WHERE id = ?', [id]);
+    // Send reply email if configured
+    try {
+      const { sendEmail } = require('../config/email');
 
-    res.json({ success: true, message: 'Reply sent successfully' });
+      const subject = `Re: ${contact.subject || 'Your message'}`;
+      const htmlMessage = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #333;">Hello ${contact.name},</h2>
+          <p style="color: #666; line-height: 1.6;">${message.replace(/\n/g, '<br>')}</p>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+          <p style="color: #999; font-size: 12px;">
+            This is a reply to your message: "${contact.message.substring(0, 100)}${contact.message.length > 100 ? '...' : ''}"
+          </p>
+        </div>
+      `;
+
+      await sendEmail(contact.email, subject, message, htmlMessage);
+
+      // Mark as read
+      await db.query('UPDATE contacts SET is_read = TRUE WHERE id = ?', [id]);
+
+      res.json({ 
+        success: true, 
+        message: 'Reply sent successfully via email',
+        emailSent: true
+      });
+    } catch (emailError) {
+      console.error('Error sending email:', emailError);
+      
+      // Mark as read even if email fails
+      await db.query('UPDATE contacts SET is_read = TRUE WHERE id = ?', [id]);
+      
+      res.json({ 
+        success: true, 
+        message: 'Reply logged but email sending failed. Please check email configuration.',
+        emailSent: false,
+        error: emailError.message
+      });
+    }
   } catch (error) {
-    console.error('Error sending reply:', error);
+    console.error('Error in replyToContact:', error);
     next(error);
   }
 };
