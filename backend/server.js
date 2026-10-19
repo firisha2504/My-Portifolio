@@ -13,6 +13,9 @@ const { apiLimiter } = require('./middleware/security');
 
 const app = express();
 
+// Trust proxy for Render/Railway deployment
+app.set('trust proxy', 1);
+
 // Middleware
 app.use(cors({ 
   origin: process.env.CLIENT_URL || 'http://localhost:3000',
