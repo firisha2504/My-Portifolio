@@ -1098,6 +1098,11 @@ const AdminSettings = () => {
   });
   const [modal, setModal] = useState({ isOpen: false, type: '', title: '', message: '' });
   const [loading, setLoading] = useState(false);
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false
+  });
 
   useEffect(() => {
     fetchUserData();
@@ -1205,33 +1210,54 @@ const AdminSettings = () => {
           <p className="form-hint">Leave blank if you don't want to change your password</p>
           <div className="form-group">
             <label>Current Password</label>
-            <input
-              type="password"
-              name="currentPassword"
-              value={formData.currentPassword}
-              onChange={handleChange}
-              placeholder="Enter current password"
-            />
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showPasswords.current ? 'text' : 'password'}
+                name="currentPassword"
+                value={formData.currentPassword}
+                onChange={handleChange}
+                placeholder="Enter current password"
+                style={{ paddingRight: '3rem' }}
+              />
+              <button type="button" onClick={() => setShowPasswords(p => ({ ...p, current: !p.current }))}
+                style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', fontSize: '1.1rem' }}>
+                {showPasswords.current ? '🙈' : '👁️'}
+              </button>
+            </div>
           </div>
           <div className="form-group">
             <label>New Password</label>
-            <input
-              type="password"
-              name="newPassword"
-              value={formData.newPassword}
-              onChange={handleChange}
-              placeholder="Enter new password"
-            />
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showPasswords.new ? 'text' : 'password'}
+                name="newPassword"
+                value={formData.newPassword}
+                onChange={handleChange}
+                placeholder="Enter new password"
+                style={{ paddingRight: '3rem' }}
+              />
+              <button type="button" onClick={() => setShowPasswords(p => ({ ...p, new: !p.new }))}
+                style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', fontSize: '1.1rem' }}>
+                {showPasswords.new ? '🙈' : '👁️'}
+              </button>
+            </div>
           </div>
           <div className="form-group">
             <label>Confirm New Password</label>
-            <input
-              type="password"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              placeholder="Confirm new password"
-            />
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showPasswords.confirm ? 'text' : 'password'}
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                placeholder="Confirm new password"
+                style={{ paddingRight: '3rem' }}
+              />
+              <button type="button" onClick={() => setShowPasswords(p => ({ ...p, confirm: !p.confirm }))}
+                style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', fontSize: '1.1rem' }}>
+                {showPasswords.confirm ? '🙈' : '👁️'}
+              </button>
+            </div>
           </div>
         </div>
 
