@@ -39,7 +39,7 @@ const Login = () => {
   return (
     <div className="login">
       <div className="login-container">
-        <form onSubmit={handleSubmit} className="login-form">
+        <form onSubmit={handleSubmit} className="login-form" autoComplete="off">
           <div className="login-header">
             <div className="login-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
