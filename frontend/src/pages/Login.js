@@ -65,7 +65,7 @@ const Login = () => {
                 placeholder="admin" 
                 value={formData.username} 
                 onChange={handleChange}
-                autoComplete="off"
+                autoComplete="new-password"
                 required 
               />
             </div>
