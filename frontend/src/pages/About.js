@@ -72,9 +72,12 @@ const About = () => {
         
         <section className="about-content">
           <div className="about-text">
-            <p>I’m a full-stack developer with over five years of experience building web applications that are fast, accessible, and scalable. I specialize in the JavaScript ecosystem, working with React on the frontend and Node.js on the backend, while applying strong design principles to create clean, user-focused interfaces.
+            <p>
+I'm a passionate Full-Stack Developer who enjoys building practical solutions through clean code, thoughtful design, and modern web technologies.
 
-Beyond development, I’m passionate about visual design and crafting digital experiences that balance performance with aesthetics. When I’m not coding or designing, you’ll find me exploring new technologies, contributing to open-source projects, or writing technical articles. I believe in continuous learning and sharing knowledge with the community.</p>
+Using the MERN stack, I develop responsive frontend experiences, robust backend APIs, and database-driven applications that solve real-world problems. I value continuous learning, collaboration, and writing maintainable code.
+
+I'm looking for an opportunity to contribute my skills, grow alongside experienced developers, and help build products that make a meaningful impact.</p>
           </div>
         </section>
 

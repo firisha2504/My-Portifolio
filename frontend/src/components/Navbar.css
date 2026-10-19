@@ -58,6 +58,14 @@
   color: var(--accent);
 }
 
+.nav-links a.active {
+  color: var(--accent);
+}
+
+.nav-links a.active::after {
+  width: 100%;
+}
+
 .theme-toggle {
   background: var(--bg-card);
   border: 1px solid var(--border);
