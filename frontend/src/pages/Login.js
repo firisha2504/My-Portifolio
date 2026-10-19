@@ -64,7 +64,8 @@ const Login = () => {
                 name="username" 
                 placeholder="admin" 
                 value={formData.username} 
-                onChange={handleChange} 
+                onChange={handleChange}
+                autoComplete="off"
                 required 
               />
             </div>
@@ -83,7 +84,8 @@ const Login = () => {
                 name="password" 
                 placeholder="Enter your password" 
                 value={formData.password} 
-                onChange={handleChange} 
+                onChange={handleChange}
+                autoComplete="new-password"
                 required 
               />
               <button
