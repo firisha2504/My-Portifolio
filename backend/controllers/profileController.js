@@ -33,6 +33,11 @@ exports.updateProfile = async (req, res, next) => {
     // Handle profile image upload
     if (req.files && req.files.profile_image) {
       if (isCloudinaryConfigured) {
+        console.log('Cloudinary config:', {
+          cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+          api_key: process.env.CLOUDINARY_API_KEY,
+          api_secret: process.env.CLOUDINARY_API_SECRET ? '***' + process.env.CLOUDINARY_API_SECRET.slice(-4) : 'NOT SET'
+        });
         console.log('Uploading profile image to Cloudinary...');
         const result = await cloudinary.uploader.upload(req.files.profile_image[0].path);
         profile_image = result.secure_url;
