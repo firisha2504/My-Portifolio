@@ -6,7 +6,7 @@ const sendEmail = async (to, subject, text, html) => {
   try {
     const data = await resend.emails.send({
       from: `${process.env.EMAIL_FROM_NAME || 'Portfolio'} <onboarding@resend.dev>`,
-      to,
+      to: [to],
       subject,
       text,
       html

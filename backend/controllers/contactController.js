@@ -88,19 +88,24 @@ exports.replyToContact = async (req, res, next) => {
     try {
       const { sendEmail } = require('../config/email');
 
-      const subject = `Re: ${contact.subject || 'Your message'}`;
+      const subject = `Re: ${contact.subject || 'Your message'} [To: ${contact.name} <${contact.email}>]`;
       const htmlMessage = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #333;">Hello ${contact.name},</h2>
+          <div style="background:#f9f9f9;padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:13px;color:#666;">
+            <strong>Reply to:</strong> ${contact.name} &lt;${contact.email}&gt;<br/>
+            <strong>Original subject:</strong> ${contact.subject || 'No subject'}<br/>
+            <strong>Original message:</strong> "${contact.message.substring(0, 150)}${contact.message.length > 150 ? '...' : ''}"
+          </div>
+          <h2 style="color: #333;">Your reply:</h2>
           <p style="color: #666; line-height: 1.6;">${message.replace(/\n/g, '<br>')}</p>
           <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
           <p style="color: #999; font-size: 12px;">
-            This is a reply to your message: "${contact.message.substring(0, 100)}${contact.message.length > 100 ? '...' : ''}"
+            ⚠️ Note: This email was sent to you (${process.env.EMAIL_USER}) because Resend requires domain verification to send to other recipients. Forward this manually to ${contact.email} if needed, or verify a domain at resend.com/domains.
           </p>
         </div>
       `;
 
-      await sendEmail(contact.email, subject, message, htmlMessage);
+      await sendEmail(process.env.EMAIL_USER || 'naniabdi2504@gmail.com', subject, message, htmlMessage);
 
       // Mark as read
       await db.query('UPDATE contacts SET is_read = TRUE WHERE id = ?', [id]);
