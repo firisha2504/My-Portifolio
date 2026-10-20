@@ -3,13 +3,43 @@ import { Link } from 'react-router-dom';
 import API from '../utils/api';
 import './Home.css';
 
+const roles = [
+  'Full Stack Developer',
+  'React.js Enthusiast',
+  'Node.js Developer',
+  'Problem Solver',
+  'Clean Code Advocate',
+];
+
 const Home = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [roleIndex, setRoleIndex] = useState(0);
+  const [displayed, setDisplayed] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchProfile();
   }, []);
+
+  // Typewriter effect
+  useEffect(() => {
+    const current = roles[roleIndex];
+    let timeout;
+
+    if (!isDeleting && displayed.length < current.length) {
+      timeout = setTimeout(() => setDisplayed(current.slice(0, displayed.length + 1)), 80);
+    } else if (!isDeleting && displayed.length === current.length) {
+      timeout = setTimeout(() => setIsDeleting(true), 1800);
+    } else if (isDeleting && displayed.length > 0) {
+      timeout = setTimeout(() => setDisplayed(current.slice(0, displayed.length - 1)), 45);
+    } else if (isDeleting && displayed.length === 0) {
+      setIsDeleting(false);
+      setRoleIndex((prev) => (prev + 1) % roles.length);
+    }
+
+    return () => clearTimeout(timeout);
+  }, [displayed, isDeleting, roleIndex]);
 
   const fetchProfile = async () => {
     try {
@@ -33,13 +63,34 @@ const Home = () => {
               <img src={profile.profile_image} alt={profile.name} className="profile-pic" />
             </div>
           )}
-          <h2>{profile?.title || 'FULL-STACK DEVELOPER AND GRAPHIC DESIGNER'}</h2>
-          <h1>Hi, I'm <span>{profile?.name || 'FIROMSA ABDI'}</span></h1>
-          <p>{profile?.bio || 'I’m a full-stack developer and graphic designer passionate about building scalable web applications with clean, intuitive design. I bring together strong backend development, modern frontend technologies, and visual creativity to create digital products that are both powerful and user-focused.'}</p>
+          <h2>{profile?.title || 'FULL STACK DEVELOPER'}</h2>
+          <h1>Hi, I'm <span>{profile?.name || 'Firomsa Abdi'}</span></h1>
+
+          <div className="typewriter-wrapper">
+            <span className="typewriter-text">{displayed}</span>
+            <span className="typewriter-cursor">|</span>
+          </div>
+
+          <p className="hero-bio">{profile?.bio || "I build modern web applications from front to back — turning ideas into clean, scalable, and impactful digital experiences."}</p>
+
+          <div className="hero-tags">
+            <span>⚡ React.js</span>
+            <span>🛠️ Node.js</span>
+            <span>🗄️ MySQL</span>
+            <span>🚀 Express</span>
+          </div>
+
           <div className="hero-buttons">
             <Link to="/projects" className="btn-primary">View My Work</Link>
+            <Link to="/contact" className="btn-secondary">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+              Hire Me
+            </Link>
             {profile?.resume_link && (
-              <a href={profile.resume_link} target="_blank" rel="noopener noreferrer" className="btn-secondary">
+              <a href={profile.resume_link} target="_blank" rel="noopener noreferrer" className="btn-outline">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
                 </svg>
