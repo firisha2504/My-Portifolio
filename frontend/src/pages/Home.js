@@ -51,13 +51,13 @@ const Home = () => {
     let timeout;
 
     if (!isDeletingName && displayedName.length < name.length) {
-      timeout = setTimeout(() => setDisplayedName(name.slice(0, displayedName.length + 1)), 100);
+      timeout = setTimeout(() => setDisplayedName(name.slice(0, displayedName.length + 1)), 180);
     } else if (!isDeletingName && displayedName.length === name.length) {
-      timeout = setTimeout(() => setIsDeletingName(true), 2500);
+      timeout = setTimeout(() => setIsDeletingName(true), 3000);
     } else if (isDeletingName && displayedName.length > 0) {
-      timeout = setTimeout(() => setDisplayedName(name.slice(0, displayedName.length - 1)), 60);
+      timeout = setTimeout(() => setDisplayedName(name.slice(0, displayedName.length - 1)), 120);
     } else if (isDeletingName && displayedName.length === 0) {
-      timeout = setTimeout(() => setIsDeletingName(false), 400);
+      timeout = setTimeout(() => setIsDeletingName(false), 600);
     }
 
     return () => clearTimeout(timeout);
