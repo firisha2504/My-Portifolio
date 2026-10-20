@@ -68,9 +68,8 @@ exports.replyToContact = async (req, res, next) => {
 
     // Check if email is configured
     const isEmailConfigured = 
-      process.env.EMAIL_USER && 
-      process.env.EMAIL_PASSWORD &&
-      process.env.EMAIL_USER !== 'your_email@gmail.com';
+      process.env.RESEND_API_KEY &&
+      process.env.RESEND_API_KEY.startsWith('re_');
 
     if (!isEmailConfigured) {
       console.warn('Email not configured. Reply logged but not sent.');
