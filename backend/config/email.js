@@ -1,23 +1,27 @@
-const { Resend } = require('resend');
+const Brevo = require('@getbrevo/brevo');
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const apiInstance = new Brevo.TransactionalEmailsApi();
+apiInstance.authentications['api-key'].apiKey = process.env.BREVO_API_KEY;
 
 const sendEmail = async (to, subject, text, html) => {
-  const { data, error } = await resend.emails.send({
-    from: `${process.env.EMAIL_FROM_NAME || 'Portfolio'} <onboarding@resend.dev>`,
-    to: [to],
-    subject,
-    text,
-    html
-  });
+  const sendSmtpEmail = new Brevo.SendSmtpEmail();
 
-  if (error) {
-    console.error('[Resend API Error]:', JSON.stringify(error));
-    throw new Error(error.message);
+  sendSmtpEmail.subject = subject;
+  sendSmtpEmail.htmlContent = html || `<p>${text}</p>`;
+  sendSmtpEmail.sender = {
+    name: process.env.EMAIL_FROM_NAME || 'Portfolio',
+    email: process.env.EMAIL_USER || 'naniabdi2504@gmail.com'
+  };
+  sendSmtpEmail.to = [{ email: to }];
+
+  try {
+    const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log('Email sent successfully, id:', data.messageId);
+    return { success: true, messageId: data.messageId };
+  } catch (error) {
+    console.error('[Brevo API Error]:', JSON.stringify(error));
+    throw new Error(error.message || 'Failed to send email');
   }
-
-  console.log('Email sent successfully, id:', data.id);
-  return { success: true, messageId: data.id };
 };
 
 module.exports = { sendEmail };
