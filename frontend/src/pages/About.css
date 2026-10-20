@@ -46,7 +46,7 @@
 }
 
 .about-text {
-  text-align: center;
+  text-align: left;
   padding: 3rem;
   background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
   border: 2px solid var(--border);
@@ -55,11 +55,94 @@
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
+.about-greeting {
+  margin-bottom: 1rem;
+}
+
+.greeting-badge {
+  background: rgba(255, 215, 0, 0.1);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.about-name {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin: 1rem 0 0.5rem;
+  color: var(--text-primary);
+}
+
+.about-name .highlight {
+  color: var(--accent);
+}
+
+.about-role {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.5px;
+}
+
 .about-text p {
   color: var(--text-secondary);
   line-height: 1.9;
-  margin-bottom: 1.5rem;
-  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  font-size: 1.05rem;
+}
+
+.tech-highlight {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.about-highlights {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.highlight-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--bg-primary);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.highlight-item:hover {
+  border-color: var(--accent);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(255, 215, 0, 0.1);
+}
+
+.highlight-icon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.highlight-item strong {
+  display: block;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  margin-bottom: 0.3rem;
+}
+
+.highlight-item p {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin: 0;
+  line-height: 1.4;
 }
 
 .skills-section {
@@ -176,9 +259,21 @@
   .about-subtitle {
     font-size: 1rem;
   }
+
+  .about-text {
+    padding: 2rem 1.5rem;
+  }
+
+  .about-name {
+    font-size: 1.8rem;
+  }
   
   .about-text p {
     font-size: 1rem;
+  }
+
+  .about-highlights {
+    grid-template-columns: 1fr;
   }
   
   .skills-section h2 {

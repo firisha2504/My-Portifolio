@@ -72,12 +72,58 @@ const About = () => {
         
         <section className="about-content">
           <div className="about-text">
+            <div className="about-greeting">
+              <span className="greeting-badge">👋 Nice to meet you</span>
+            </div>
+            <h2 className="about-name">I'm <span className="highlight">Firomsa Abdi</span></h2>
+            <h3 className="about-role">Full Stack Developer & Problem Solver</h3>
+
             <p>
-I'm a passionate Full-Stack Developer who enjoys building practical solutions through clean code, thoughtful design, and modern web technologies.
+              I turn ideas into reality through clean code and modern web technologies.
+              Passionate about crafting seamless digital experiences — from pixel-perfect frontends
+              to powerful backend systems that scale.
+            </p>
+            <p>
+              With the <span className="tech-highlight">MERN stack</span> as my core toolkit,
+              I build responsive, database-driven applications that solve real-world problems.
+              I believe great software is built at the intersection of technical excellence and
+              human-centered design.
+            </p>
+            <p>
+              Currently seeking opportunities to contribute, collaborate, and build products that
+              make a <span className="tech-highlight">meaningful impact</span>.
+            </p>
 
-Using the MERN stack, I develop responsive frontend experiences, robust backend APIs, and database-driven applications that solve real-world problems. I value continuous learning, collaboration, and writing maintainable code.
-
-I'm looking for an opportunity to contribute my skills, grow alongside experienced developers, and help build products that make a meaningful impact.</p>
+            <div className="about-highlights">
+              <div className="highlight-item">
+                <span className="highlight-icon">🚀</span>
+                <div>
+                  <strong>Fast Learner</strong>
+                  <p>Adapts quickly to new technologies and challenges</p>
+                </div>
+              </div>
+              <div className="highlight-item">
+                <span className="highlight-icon">💡</span>
+                <div>
+                  <strong>Problem Solver</strong>
+                  <p>Breaks down complex problems into elegant solutions</p>
+                </div>
+              </div>
+              <div className="highlight-item">
+                <span className="highlight-icon">🤝</span>
+                <div>
+                  <strong>Team Player</strong>
+                  <p>Thrives in collaborative, agile environments</p>
+                </div>
+              </div>
+              <div className="highlight-item">
+                <span className="highlight-icon">✨</span>
+                <div>
+                  <strong>Detail Oriented</strong>
+                  <p>Cares about code quality and clean architecture</p>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
