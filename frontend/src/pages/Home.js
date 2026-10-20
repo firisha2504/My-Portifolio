@@ -64,7 +64,7 @@ const Home = () => {
             </div>
           )}
           <h2>{profile?.title || 'FULL STACK DEVELOPER'}</h2>
-          <h1>Hi, I'm <span>{profile?.name || 'Firomsa Abdi'}</span></h1>
+          <h1>Hi, I'm <span className="animated-name">{profile?.name || 'Firomsa Abdi'}</span></h1>
 
           <div className="typewriter-wrapper">
             <span className="typewriter-text">{displayed}</span>
