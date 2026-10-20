@@ -11,18 +11,22 @@ const roles = [
   'Clean Code Advocate',
 ];
 
+const NAME = 'Firomsa Abdi';
+
 const Home = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [roleIndex, setRoleIndex] = useState(0);
   const [displayed, setDisplayed] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [displayedName, setDisplayedName] = useState('');
+  const [isDeletingName, setIsDeletingName] = useState(false);
 
   useEffect(() => {
     fetchProfile();
   }, []);
 
-  // Typewriter effect
+  // Typewriter effect for roles
   useEffect(() => {
     const current = roles[roleIndex];
     let timeout;
@@ -40,6 +44,24 @@ const Home = () => {
 
     return () => clearTimeout(timeout);
   }, [displayed, isDeleting, roleIndex]);
+
+  // Typewriter effect for name
+  useEffect(() => {
+    const name = profile?.name || NAME;
+    let timeout;
+
+    if (!isDeletingName && displayedName.length < name.length) {
+      timeout = setTimeout(() => setDisplayedName(name.slice(0, displayedName.length + 1)), 100);
+    } else if (!isDeletingName && displayedName.length === name.length) {
+      timeout = setTimeout(() => setIsDeletingName(true), 2500);
+    } else if (isDeletingName && displayedName.length > 0) {
+      timeout = setTimeout(() => setDisplayedName(name.slice(0, displayedName.length - 1)), 60);
+    } else if (isDeletingName && displayedName.length === 0) {
+      timeout = setTimeout(() => setIsDeletingName(false), 400);
+    }
+
+    return () => clearTimeout(timeout);
+  }, [displayedName, isDeletingName, profile]);
 
   const fetchProfile = async () => {
     try {
@@ -64,7 +86,7 @@ const Home = () => {
             </div>
           )}
           <h2>{profile?.title || 'FULL STACK DEVELOPER'}</h2>
-          <h1>Hi, I'm <span className="animated-name">{profile?.name || 'Firomsa Abdi'}</span></h1>
+          <h1>Hi, I'm <span className="animated-name">{displayedName}<span className="name-cursor">|</span></span></h1>
 
           <div className="typewriter-wrapper">
             <span className="typewriter-text">{displayed}</span>
