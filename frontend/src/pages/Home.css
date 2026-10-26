@@ -932,7 +932,7 @@
   .skills-list-home {
     grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   }
-}
+
   .hero h1 {
     font-size: 3.5rem;
   }
