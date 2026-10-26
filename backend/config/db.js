@@ -9,7 +9,7 @@ const pool = mysql.createPool({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   waitForConnections: true,
-  connectionLimit: 3, // Reduced for Clever Cloud free tier (5 max)
+  connectionLimit: 1, // Ultra-low for Clever Cloud free tier to allow both local + Render
   queueLimit: 0,
   enableKeepAlive: true,
   keepAliveInitialDelay: 0,
