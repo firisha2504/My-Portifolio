@@ -147,10 +147,10 @@
     position: absolute;
     top: 1.5rem;
     right: 1rem;
-    background: rgba(255, 215, 0, 0.1);
-    border: 1px solid var(--accent);
-    font-size: 1.8rem;
-    color: var(--accent);
+    background: transparent;
+    border: none;
+    font-size: 2rem;
+    color: var(--text-primary);
     cursor: pointer;
     padding: 0.3rem;
     width: 40px;
@@ -164,19 +164,19 @@
   }
 
   .mobile-menu-close:hover {
-    background: var(--accent);
-    color: var(--bg-card);
+    background: rgba(255, 215, 0, 0.1);
+    color: var(--accent);
     transform: rotate(90deg);
   }
 }
 
 @media (max-width: 576px) {
   .mobile-menu-close {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     width: 35px;
     height: 35px;
-    top: 1.2rem;
-    right: 0.8rem;
+    top: 1rem;
+    right: 0.5rem;
   }
 }
 
@@ -214,8 +214,8 @@
 
   .mobile-menu-close {
     position: absolute !important;
-    top: 1.5rem !important;
-    right: 1rem !important;
+    top: 1.2rem !important;
+    right: 0.5rem !important;
   }
 
   .nav-links.mobile-active {
