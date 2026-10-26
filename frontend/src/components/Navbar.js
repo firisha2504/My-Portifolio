@@ -5,18 +5,9 @@ import './Navbar.css';
 const Navbar = ({ theme, toggleTheme }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const isLoggedIn = localStorage.getItem('token');
   const isDashboard = location.pathname.startsWith('/dashboard');
   const isHomePage = location.pathname === '/';
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const handleAdminClick = (e) => {
-    if (isLoggedIn) {
-      e.preventDefault();
-      navigate('/dashboard');
-    }
-    setIsMobileMenuOpen(false);
-  };
 
   const scrollToSection = (e, sectionId) => {
     e.preventDefault();
