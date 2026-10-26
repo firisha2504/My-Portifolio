@@ -93,11 +93,7 @@ const Navbar = ({ theme, toggleTheme }) => {
               </li>
             </>
           )}
-          <li>
-            <Link to={isLoggedIn ? "/dashboard" : "/login"} onClick={handleAdminClick}>
-              Admin
-            </Link>
-          </li>
+          {/* Admin link hidden - access via direct URL: /login or /dashboard */}
           <li><button onClick={toggleTheme} className="theme-toggle">{theme === 'light' ? '🌙' : '☀️'}</button></li>
         </ul>
       </div>
