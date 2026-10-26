@@ -44,6 +44,13 @@ const Navbar = ({ theme, toggleTheme }) => {
         ></div>
 
         <ul className={`nav-links ${isMobileMenuOpen ? 'mobile-active' : ''}`}>
+          <button 
+            className="mobile-menu-close"
+            onClick={() => setIsMobileMenuOpen(false)}
+            aria-label="Close menu"
+          >
+            ✕
+          </button>
           {!isDashboard && (
             <>
               <li>

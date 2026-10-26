@@ -136,6 +136,39 @@
   opacity: 1;
 }
 
+/* Mobile Menu Close Button */
+.mobile-menu-close {
+  display: none;
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: transparent;
+  border: none;
+  font-size: 2rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 0.5rem;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  line-height: 1;
+}
+
+.mobile-menu-close:hover {
+  background: rgba(255, 215, 0, 0.1);
+  color: var(--accent);
+  transform: rotate(90deg);
+}
+
+@media (max-width: 768px) {
+  .mobile-menu-close {
+    display: flex;
+  }
+}
+
 /* Tablet Responsive */
 @media (max-width: 991px) {
   .nav-links {
