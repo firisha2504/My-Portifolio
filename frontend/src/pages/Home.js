@@ -182,27 +182,62 @@ const Home = () => {
           <div className="section-header">
             <span className="section-badge">About Me</span>
             <h2>Who I Am</h2>
+            <p>Building digital experiences with passion and precision</p>
           </div>
           
           <div className="about-content">
-            <div className="about-text">
-              <p className="about-intro">
-                👋 Hello! I'm <span className="highlight">{profile?.name || 'Firomsa Abdi'}</span>, 
-                a passionate full-stack developer who loves building meaningful digital experiences.
-              </p>
-              <p>
-                {profile?.bio || "I design and develop modern web applications from front to back, combining clean UI design, powerful backend functionality, and efficient database management to create meaningful digital experiences."}
-              </p>
+            <div className="about-main">
+              <div className="about-text-card">
+                <div className="about-greeting">
+                  <span className="greeting-badge">👋 Hello!</span>
+                </div>
+                <p className="about-intro">
+                  I'm <span className="highlight">{profile?.name || 'Firomsa Abdi'}</span>, 
+                  a passionate full-stack developer who loves building meaningful digital experiences.
+                </p>
+                <p className="about-description">
+                  {profile?.bio || "I design and develop modern web applications from front to back, combining clean UI design, powerful backend functionality, and efficient database management to create meaningful digital experiences."}
+                </p>
+                <p className="about-tech">
+                  With the <span className="tech-highlight">MERN stack</span> as my core toolkit, 
+                  I build responsive, database-driven applications that solve real-world problems.
+                </p>
+              </div>
+
+              <div className="about-highlights-grid">
+                <div className="highlight-card">
+                  <span className="highlight-emoji">🚀</span>
+                  <h4>Fast Learner</h4>
+                  <p>Adapts quickly to new technologies</p>
+                </div>
+                <div className="highlight-card">
+                  <span className="highlight-emoji">💡</span>
+                  <h4>Problem Solver</h4>
+                  <p>Elegant solutions to complex problems</p>
+                </div>
+                <div className="highlight-card">
+                  <span className="highlight-emoji">🤝</span>
+                  <h4>Team Player</h4>
+                  <p>Thrives in collaborative environments</p>
+                </div>
+                <div className="highlight-card">
+                  <span className="highlight-emoji">✨</span>
+                  <h4>Detail Oriented</h4>
+                  <p>Cares about quality and architecture</p>
+                </div>
+              </div>
             </div>
 
             {skills.length > 0 && (
-              <div className="skills-grid">
-                <h3>Technologies & Tools</h3>
-                <div className="skills-list">
-                  {skills.slice(0, 12).map((skill) => (
-                    <div key={skill.id} className="skill-badge">
+              <div className="skills-showcase">
+                <h3>
+                  <span className="skills-icon">🛠️</span> Technologies & Tools
+                </h3>
+                <div className="skills-list-home">
+                  {skills.slice(0, 16).map((skill) => (
+                    <div key={skill.id} className="skill-badge-home">
                       {skill.icon && <span className="skill-icon">{skill.icon}</span>}
-                      <span>{skill.name}</span>
+                      <span className="skill-name">{skill.name}</span>
                     </div>
                   ))}
                 </div>
