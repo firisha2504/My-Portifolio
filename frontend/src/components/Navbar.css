@@ -215,7 +215,7 @@
   .mobile-menu-close {
     position: absolute !important;
     top: 1.5rem !important;
-    right: 1.5rem !important;
+    right: 1rem !important;
   }
 
   .nav-links.mobile-active {
