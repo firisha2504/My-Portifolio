@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import './Navbar.css';
 
@@ -8,16 +8,19 @@ const Navbar = ({ theme, toggleTheme }) => {
   const isLoggedIn = localStorage.getItem('token');
   const isDashboard = location.pathname.startsWith('/dashboard');
   const isHomePage = location.pathname === '/';
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleAdminClick = (e) => {
     if (isLoggedIn) {
       e.preventDefault();
       navigate('/dashboard');
     }
+    setIsMobileMenuOpen(false);
   };
 
   const scrollToSection = (e, sectionId) => {
     e.preventDefault();
+    setIsMobileMenuOpen(false);
     if (isHomePage) {
       const element = document.getElementById(sectionId);
       if (element) {
@@ -31,8 +34,19 @@ const Navbar = ({ theme, toggleTheme }) => {
   return (
     <nav className="navbar">
       <div className="container">
-        <Link to="/" className="logo">Portfolio</Link>
-        <ul className="nav-links">
+        <Link to="/" className="logo" onClick={() => setIsMobileMenuOpen(false)}>Portfolio</Link>
+        
+        <button 
+          className={`mobile-menu-toggle ${isMobileMenuOpen ? 'active' : ''}`}
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label="Toggle menu"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <ul className={`nav-links ${isMobileMenuOpen ? 'mobile-active' : ''}`}>
           {!isDashboard && (
             <>
               <li>
