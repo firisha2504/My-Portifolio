@@ -143,10 +143,10 @@
 
 @media (max-width: 768px) {
   .mobile-menu-close {
-    display: flex;
-    position: absolute;
-    top: 1.5rem;
-    right: 1rem;
+    display: flex !important;
+    position: absolute !important;
+    top: 1.2rem !important;
+    right: 1rem !important;
     background: transparent;
     border: none;
     font-size: 2rem;
@@ -161,6 +161,7 @@
     transition: all 0.3s ease;
     line-height: 1;
     font-weight: 300;
+    margin: 0 !important;
   }
 
   .mobile-menu-close:hover {
@@ -172,11 +173,11 @@
 
 @media (max-width: 576px) {
   .mobile-menu-close {
-    font-size: 1.8rem;
-    width: 35px;
-    height: 35px;
-    top: 1rem;
-    right: 0.5rem;
+    font-size: 1.8rem !important;
+    width: 35px !important;
+    height: 35px !important;
+    top: 1rem !important;
+    right: 0.8rem !important;
   }
 }
 
@@ -210,12 +211,6 @@
     border-left: 1px solid var(--border);
     overflow-y: auto;
     z-index: 1002;
-  }
-
-  .mobile-menu-close {
-    position: absolute !important;
-    top: 1.2rem !important;
-    right: 0.5rem !important;
   }
 
   .nav-links.mobile-active {
