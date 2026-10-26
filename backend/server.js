@@ -19,7 +19,8 @@ app.set('trust proxy', 1);
 // Middleware
 const allowedOrigins = [
   'http://localhost:3000',
-  'https://my-portifolio-three-theta.vercel.app',
+  'https://firo-portifolio.vercel.app',
+  'https://my-portifolio-three-theta.vercel.app', // Old URL (keep for safety)
   process.env.CLIENT_URL
 ].filter(Boolean);
 
