@@ -116,6 +116,26 @@
   transform: rotate(-45deg) translate(7px, -7px);
 }
 
+/* Mobile Menu Overlay */
+.mobile-menu-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.mobile-menu-overlay.active {
+  display: block;
+  opacity: 1;
+}
+
 /* Tablet Responsive */
 @media (max-width: 991px) {
   .nav-links {
@@ -199,7 +219,8 @@
   }
 
   .nav-links {
-    width: 100%;
+    width: 280px;
+    max-width: 85vw;
     right: -100%;
   }
 

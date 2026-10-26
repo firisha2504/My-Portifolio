@@ -46,6 +46,12 @@ const Navbar = ({ theme, toggleTheme }) => {
           <span></span>
         </button>
 
+        {/* Mobile Menu Overlay */}
+        <div 
+          className={`mobile-menu-overlay ${isMobileMenuOpen ? 'active' : ''}`}
+          onClick={() => setIsMobileMenuOpen(false)}
+        ></div>
+
         <ul className={`nav-links ${isMobileMenuOpen ? 'mobile-active' : ''}`}>
           {!isDashboard && (
             <>
