@@ -139,7 +139,7 @@
 /* Mobile Menu Close Button */
 .mobile-menu-close {
   display: none;
-  position: absolute;
+  position: fixed;
   top: 1.5rem;
   right: 1.5rem;
   background: transparent;
@@ -155,6 +155,7 @@
   border-radius: 50%;
   transition: all 0.3s ease;
   line-height: 1;
+  z-index: 1003;
 }
 
 .mobile-menu-close:hover {
@@ -166,6 +167,12 @@
 @media (max-width: 768px) {
   .mobile-menu-close {
     display: flex;
+  }
+}
+
+@media (max-width: 576px) {
+  .mobile-menu-close {
+    right: calc(85vw - 3rem);
   }
 }
 
