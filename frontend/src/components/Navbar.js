@@ -7,11 +7,24 @@ const Navbar = ({ theme, toggleTheme }) => {
   const location = useLocation();
   const isLoggedIn = localStorage.getItem('token');
   const isDashboard = location.pathname.startsWith('/dashboard');
+  const isHomePage = location.pathname === '/';
 
   const handleAdminClick = (e) => {
     if (isLoggedIn) {
       e.preventDefault();
       navigate('/dashboard');
+    }
+  };
+
+  const scrollToSection = (e, sectionId) => {
+    e.preventDefault();
+    if (isHomePage) {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    } else {
+      navigate(`/#${sectionId}`);
     }
   };
 
@@ -22,10 +35,42 @@ const Navbar = ({ theme, toggleTheme }) => {
         <ul className="nav-links">
           {!isDashboard && (
             <>
-              <li><Link to="/" className={location.pathname === '/' ? 'active' : ''}>Home</Link></li>
-              <li><Link to="/about" className={location.pathname === '/about' ? 'active' : ''}>About</Link></li>
-              <li><Link to="/projects" className={location.pathname === '/projects' ? 'active' : ''}>Projects</Link></li>
-              <li><Link to="/contact" className={location.pathname === '/contact' ? 'active' : ''}>Contact</Link></li>
+              <li>
+                <a 
+                  href="#hero" 
+                  onClick={(e) => isHomePage ? scrollToSection(e, 'hero') : navigate('/')}
+                  className={location.pathname === '/' && location.hash === '' ? 'active' : ''}
+                >
+                  Home
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="#about" 
+                  onClick={(e) => scrollToSection(e, 'about')}
+                  className={location.hash === '#about' ? 'active' : ''}
+                >
+                  About
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="#projects" 
+                  onClick={(e) => scrollToSection(e, 'projects')}
+                  className={location.hash === '#projects' ? 'active' : ''}
+                >
+                  Projects
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="#contact" 
+                  onClick={(e) => scrollToSection(e, 'contact')}
+                  className={location.hash === '#contact' ? 'active' : ''}
+                >
+                  Contact
+                </a>
+              </li>
             </>
           )}
           <li>
