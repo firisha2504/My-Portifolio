@@ -4,7 +4,7 @@ import './About.css';
 
 const About = () => {
   const [profile, setProfile] = useState(null);
-  const [skills, setSkills] = useState([]);
+  const [skillCategories, setSkillCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -19,7 +19,11 @@ const About = () => {
       ]);
       
       setProfile(profileRes.data.data);
-      setSkills(skillsRes.data.data || []);
+      
+      // Skills API returns grouped by category
+      if (skillsRes.data.success && skillsRes.data.data) {
+        setSkillCategories(skillsRes.data.data);
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -107,13 +111,19 @@ const About = () => {
           <h2>Skills & Technologies</h2>
           <p className="skills-subtitle">Tools and technologies I work with</p>
           
-          {skills.length > 0 ? (
-            <div className="skills-grid-modern">
-              {skills.map((skill) => (
-                <div key={skill.id} className="skill-card-modern">
-                  {skill.icon && <span className="skill-icon-large">{skill.icon}</span>}
-                  <h3>{skill.name}</h3>
-                  {skill.category && <span className="skill-category-tag">{skill.category}</span>}
+          {skillCategories.length > 0 ? (
+            <div className="skills-categories">
+              {skillCategories.map((category, index) => (
+                <div key={index} className="skill-category">
+                  <div className="category-header">
+                    <span className="category-icon">{category.icon || '📌'}</span>
+                    <h3>{category.title}</h3>
+                  </div>
+                  <div className="category-skills">
+                    {category.skills.map((skill) => (
+                      <span key={skill.id} className="skill-tag">{skill.name}</span>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
