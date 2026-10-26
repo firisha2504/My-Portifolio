@@ -76,7 +76,17 @@ const Home = () => {
       ]);
       setProfile(profileRes.data.data);
       setProjects(projectsRes.data.data);
-      setSkills(skillsRes.data.data);
+      
+      // Skills API returns categories with nested skills, flatten them
+      const skillCategories = skillsRes.data.data || [];
+      const flatSkills = skillCategories.flatMap(category => 
+        category.skills.map(skill => ({
+          ...skill,
+          icon: category.icon,
+          category: category.title
+        }))
+      );
+      setSkills(flatSkills);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
