@@ -96,12 +96,22 @@ const Home = () => {
 
   const handleContactSubmit = async (e) => {
     e.preventDefault();
+    
+    // Client-side validation
+    if (contactForm.message.trim().length < 10) {
+      setContactStatus({ type: 'error', message: 'Message must be at least 10 characters long.' });
+      return;
+    }
+    
     try {
       await API.post('/contacts', contactForm);
       setContactStatus({ type: 'success', message: 'Thank you! I will get back to you soon.' });
       setContactForm({ name: '', email: '', subject: '', message: '' });
     } catch (error) {
-      setContactStatus({ type: 'error', message: 'Failed to send message. Please try again.' });
+      const errorMessage = error.response?.data?.errors?.[0]?.msg 
+        || error.response?.data?.message 
+        || 'Failed to send message. Please try again.';
+      setContactStatus({ type: 'error', message: errorMessage });
     }
   };
 
@@ -373,11 +383,12 @@ const Home = () => {
               />
               <textarea
                 name="message"
-                placeholder="Your Message"
+                placeholder="Your Message (minimum 10 characters)"
                 rows="5"
                 value={contactForm.message}
                 onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
                 required
+                minLength={10}
               />
               <button type="submit" className="btn-primary">Send Message</button>
               
